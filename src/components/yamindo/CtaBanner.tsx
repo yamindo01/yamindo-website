@@ -1,7 +1,12 @@
+"use client";
+
 import { Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLang } from "@/lib/i18n";
 
 export default function CtaBanner({ siteConfig }: { siteConfig: Record<string, string> }) {
+  const { lang, t } = useLang();
+
   return (
     <section className="relative py-12 md:py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-[var(--yamindo-teal)] to-teal-500" />
@@ -17,10 +22,14 @@ export default function CtaBanner({ siteConfig }: { siteConfig: Record<string, s
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold">
-              {siteConfig.cta_title || "Bergabunglah Dengan Tim Relawan Kami"}
+              {siteConfig.cta_title && lang === "en" && siteConfig.en_cta_title
+                ? siteConfig.en_cta_title
+                : siteConfig.cta_title || "Bergabunglah Dengan Tim Relawan Kami"}
             </h2>
             <p className="text-white/80 mt-1">
-              {siteConfig.cta_subtitle || "Jadilah bagian dari perubahan nyata untuk Indonesia"}
+              {siteConfig.cta_subtitle && lang === "en" && siteConfig.en_cta_subtitle
+                ? siteConfig.en_cta_subtitle
+                : siteConfig.cta_subtitle || "Jadilah bagian dari perubahan nyata untuk Indonesia"}
             </p>
           </div>
         </div>
@@ -30,7 +39,7 @@ export default function CtaBanner({ siteConfig }: { siteConfig: Record<string, s
           className="bg-white text-[var(--yamindo-teal-dark)] hover:bg-white/90 rounded-full px-8 shadow-lg font-semibold"
         >
           <a href="#tim">
-            Pelajari Selengkapnya
+            {t("Pelajari Selengkapnya", "Learn More")}
             <ArrowRight className="w-4 h-4 ml-2" />
           </a>
         </Button>

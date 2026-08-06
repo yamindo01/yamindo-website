@@ -1,17 +1,25 @@
+"use client";
+
 import { Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLang, getField } from "@/lib/i18n";
 
-interface BlogPost {
-  id: number;
+interface BlogPostItem {
+  id: string;
   title: string;
+  en_title: string;
   category: string;
+  en_category: string;
   date: string;
   image: string;
   excerpt: string;
+  en_excerpt: string;
   active: boolean;
 }
 
-export default function Blog({ posts }: { posts: BlogPost[] }) {
+export default function Blog({ posts }: { posts: BlogPostItem[] }) {
+  const { lang, t } = useLang();
+
   return (
     <section id="berita" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4">
@@ -19,11 +27,11 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
-            Berita Terkini
+            {t("Berita Terkini", "Latest News")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Artikel & Berita Kami
+            {t("Artikel & Berita Kami", "Our Articles & News")}
           </h2>
         </div>
 
@@ -37,11 +45,11 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={post.image}
-                  alt={post.title}
+                  alt={getField(post, "title", lang)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <span className="absolute top-3 left-3 text-xs font-semibold text-[var(--yamindo-teal-dark)] bg-[var(--yamindo-teal-light)]/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                  {post.category}
+                  {getField(post, "category", lang)}
                 </span>
               </div>
               <div className="p-5">
@@ -50,16 +58,16 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
                   {post.date}
                 </div>
                 <h3 className="font-bold text-foreground mb-2 line-clamp-2 group-hover:text-[var(--yamindo-teal)] transition-colors">
-                  <a href="#">{post.title}</a>
+                  <a href="#">{getField(post, "title", lang)}</a>
                 </h3>
                 <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {post.excerpt}
+                  {getField(post, "excerpt", lang)}
                 </p>
                 <a
                   href="#"
                   className="inline-flex items-center gap-1 text-sm font-medium text-[var(--yamindo-teal)] mt-3 hover:gap-2 transition-all"
                 >
-                  Baca Selengkapnya
+                  {t("Baca Selengkapnya", "Read More")}
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
@@ -75,7 +83,7 @@ export default function Blog({ posts }: { posts: BlogPost[] }) {
             className="rounded-full px-8 border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)]"
           >
             <a href="#">
-              Lihat Semua Berita
+              {t("Lihat Semua Berita", "View All News")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </a>
           </Button>

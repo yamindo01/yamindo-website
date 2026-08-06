@@ -13,6 +13,7 @@ import Blog from "@/components/yamindo/Blog";
 import Partners from "@/components/yamindo/Partners";
 import Footer from "@/components/yamindo/Footer";
 import AdminPanel from "@/components/yamindo/AdminPanel";
+import { LangProvider } from "@/lib/i18n";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -53,14 +54,9 @@ async function getContent() {
 
   return {
     siteConfig,
-    heroSlides: heroSlides.map((s) => ({
-      ...s,
-      bullets: JSON.parse(s.bullets || "[]"),
-    })),
+    heroSlides,
     services,
-    aboutInfo: aboutInfo
-      ? { ...aboutInfo, bullets: JSON.parse(aboutInfo.bullets || "[]") }
-      : null,
+    aboutInfo,
     causes,
     counters,
     teamMembers,
@@ -77,24 +73,26 @@ export default async function Home() {
   const content = await getContent();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar siteConfig={content.siteConfig} />
-      <Header />
-      <main className="flex-1">
-        <HeroSlider slides={content.heroSlides} />
-        <Services services={content.services} />
-        <CtaBanner siteConfig={content.siteConfig} />
-        <AboutCauses aboutInfo={content.aboutInfo} causes={content.causes} />
-        <Counter counters={content.counters} />
-        <Team members={content.teamMembers} />
-        <Gallery images={content.galleryImages} />
-        <Testimonials testimonials={content.testimonials} />
-        <DonationCta presets={content.donationPresets} />
-        <Blog posts={content.blogPosts} />
-        <Partners partners={content.partners} />
-      </main>
-      <Footer siteConfig={content.siteConfig} events={content.footerEvents} />
-      <AdminPanel />
-    </div>
+    <LangProvider>
+      <div className="min-h-screen flex flex-col">
+        <TopBar siteConfig={content.siteConfig} />
+        <Header />
+        <main className="flex-1">
+          <HeroSlider slides={content.heroSlides} />
+          <Services services={content.services} />
+          <CtaBanner siteConfig={content.siteConfig} />
+          <AboutCauses aboutInfo={content.aboutInfo} causes={content.causes} />
+          <Counter counters={content.counters} />
+          <Team members={content.teamMembers} />
+          <Gallery images={content.galleryImages} />
+          <Testimonials testimonials={content.testimonials} />
+          <DonationCta presets={content.donationPresets} />
+          <Blog posts={content.blogPosts} />
+          <Partners partners={content.partners} />
+        </main>
+        <Footer siteConfig={content.siteConfig} events={content.footerEvents} />
+        <AdminPanel />
+      </div>
+    </LangProvider>
   );
 }

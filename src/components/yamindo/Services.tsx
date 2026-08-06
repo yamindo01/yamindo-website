@@ -1,6 +1,7 @@
 "use client";
 
 import { GraduationCap, HeartPulse, Home, Droplets, BookOpen, HandHelping } from "lucide-react";
+import { useLang, getField } from "@/lib/i18n";
 
 type LucideIcon = React.ComponentType<{ className?: string }>;
 
@@ -14,9 +15,11 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 interface ServiceItem {
-  id: number;
+  id: string;
   title: string;
+  en_title: string;
   description: string;
+  en_description: string;
   image: string;
   icon: string;
   color: string;
@@ -25,6 +28,8 @@ interface ServiceItem {
 }
 
 export default function Services({ services }: { services: ServiceItem[] }) {
+  const { lang, t } = useLang();
+
   return (
     <section id="layanan" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4">
@@ -32,11 +37,11 @@ export default function Services({ services }: { services: ServiceItem[] }) {
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
-            Layanan Kami
+            {t("Layanan Kami", "Our Services")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Program Utama Kami
+            {t("Program Utama Kami", "Our Main Programs")}
           </h2>
         </div>
 
@@ -54,7 +59,7 @@ export default function Services({ services }: { services: ServiceItem[] }) {
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={service.image}
-                    alt={service.title}
+                    alt={getField(service, "title", lang)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className={`absolute inset-0 bg-gradient-to-t ${service.color} opacity-60`} />
@@ -68,10 +73,10 @@ export default function Services({ services }: { services: ServiceItem[] }) {
                 {/* Content */}
                 <div className="p-5 bg-white">
                   <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-[var(--yamindo-teal)] transition-colors">
-                    {service.title}
+                    {getField(service, "title", lang)}
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {service.description}
+                    {getField(service, "description", lang)}
                   </p>
                 </div>
               </div>

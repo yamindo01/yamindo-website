@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Users, Globe, Baby, Home } from "lucide-react";
+import { useLang, getField } from "@/lib/i18n";
 
 type LucideIcon = React.ComponentType<{ className?: string }>;
 
@@ -13,8 +14,9 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 interface CounterItem {
-  id: number;
+  id: string;
   label: string;
+  en_label: string;
   value: number;
   icon: string;
   active: boolean;
@@ -49,6 +51,7 @@ function useCountUp(target: number, isActive: boolean) {
 }
 
 function StatCard({ stat, isVisible }: { stat: CounterItem; isVisible: boolean }) {
+  const { lang } = useLang();
   const count = useCountUp(stat.value, isVisible);
   const IconComponent = iconMap[stat.icon] || Users;
 
@@ -58,9 +61,9 @@ function StatCard({ stat, isVisible }: { stat: CounterItem; isVisible: boolean }
         <IconComponent className="w-8 h-8 text-white" />
       </div>
       <p className="text-3xl md:text-4xl font-bold text-white">
-        {count.toLocaleString("id-ID")}
+        {count.toLocaleString(lang === "en" ? "en-US" : "id-ID")}
       </p>
-      <p className="text-white/70 mt-1 text-sm">{stat.label}</p>
+      <p className="text-white/70 mt-1 text-sm">{getField(stat, "label", lang)}</p>
     </div>
   );
 }

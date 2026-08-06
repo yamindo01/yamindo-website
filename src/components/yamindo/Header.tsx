@@ -3,21 +3,24 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const navLinks = [
-  { label: "Beranda", href: "#beranda" },
-  { label: "Tentang", href: "#tentang" },
-  { label: "Layanan", href: "#layanan" },
-  { label: "Program", href: "#program" },
-  { label: "Tim", href: "#tim" },
-  { label: "Galeri", href: "#galeri" },
-  { label: "Berita", href: "#berita" },
-  { label: "Kontak", href: "#kontak" },
-];
+import { useLang } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/yamindo/LanguageSwitcher";
 
 export default function Header() {
+  const { lang, t } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { label: t("Beranda", "Home"), href: "#beranda" },
+    { label: t("Tentang", "About"), href: "#tentang" },
+    { label: t("Layanan", "Services"), href: "#layanan" },
+    { label: t("Program", "Programs"), href: "#program" },
+    { label: t("Tim", "Team"), href: "#tim" },
+    { label: t("Galeri", "Gallery"), href: "#galeri" },
+    { label: t("Berita", "News"), href: "#berita" },
+    { label: t("Kontak", "Contact"), href: "#kontak" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,7 +58,7 @@ export default function Header() {
               Yamindo
             </span>
             <p className="text-[10px] text-muted-foreground -mt-1 leading-tight">
-              Yayasan Yasir Amin Indonesia
+              {t("Yayasan Yasir Amin Indonesia", "Yasir Amin Indonesia Foundation")}
             </p>
           </div>
         </a>
@@ -74,16 +77,19 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* CTA Button */}
-        <Button
-          asChild
-          className="hidden lg:flex bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full px-6 shadow-lg shadow-orange-200 hover:shadow-orange-300 transition-all"
-        >
-          <a href="#donasi" onClick={(e) => handleNavClick(e, "#donasi")}>
-            <Heart className="w-4 h-4 mr-2 fill-white" />
-            Donasi Sekarang
-          </a>
-        </Button>
+        {/* Right side: Language Switcher + CTA */}
+        <div className="hidden lg:flex items-center gap-3">
+          <LanguageSwitcher />
+          <Button
+            asChild
+            className="bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full px-6 shadow-lg shadow-orange-200 hover:shadow-orange-300 transition-all"
+          >
+            <a href="#donasi" onClick={(e) => handleNavClick(e, "#donasi")}>
+              <Heart className="w-4 h-4 mr-2 fill-white" />
+              {t("Donasi Sekarang", "Donate Now")}
+            </a>
+          </Button>
+        </div>
 
         {/* Mobile Menu Toggle */}
         <button
@@ -113,13 +119,16 @@ export default function Header() {
                 {link.label}
               </a>
             ))}
+            <div className="flex items-center gap-3 mt-3 px-4">
+              <LanguageSwitcher />
+            </div>
             <Button
               asChild
               className="mt-2 bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full"
             >
               <a href="#donasi" onClick={(e) => handleNavClick(e, "#donasi")}>
                 <Heart className="w-4 h-4 mr-2 fill-white" />
-                Donasi Sekarang
+                {t("Donasi Sekarang", "Donate Now")}
               </a>
             </Button>
           </nav>

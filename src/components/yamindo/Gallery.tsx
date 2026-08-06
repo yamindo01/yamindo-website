@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useLang, getField } from "@/lib/i18n";
 
-interface GalleryImage {
-  id: number;
+interface GalleryImageItem {
+  id: string;
   src: string;
   alt: string;
+  en_alt: string;
   order: number;
   active: boolean;
 }
 
-export default function Gallery({ images }: { images: GalleryImage[] }) {
+export default function Gallery({ images }: { images: GalleryImageItem[] }) {
+  const { lang, t } = useLang();
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   const openLightbox = (idx: number) => setLightboxIdx(idx);
@@ -27,11 +29,11 @@ export default function Gallery({ images }: { images: GalleryImage[] }) {
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
-            Galeri Kegiatan
+            {t("Galeri Kegiatan", "Activity Gallery")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Dokumentasi Kegiatan Kami
+            {t("Dokumentasi Kegiatan Kami", "Our Activity Documentation")}
           </h2>
         </div>
 
@@ -45,12 +47,12 @@ export default function Gallery({ images }: { images: GalleryImage[] }) {
             >
               <img
                 src={img.src}
-                alt={img.alt}
+                alt={getField(img, "alt", lang)}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-[var(--yamindo-teal-dark)]/0 group-hover:bg-[var(--yamindo-teal-dark)]/30 transition-colors duration-300 flex items-center justify-center">
                 <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                  {img.alt}
+                  {getField(img, "alt", lang)}
                 </span>
               </div>
             </div>
@@ -67,32 +69,32 @@ export default function Gallery({ images }: { images: GalleryImage[] }) {
           <button
             onClick={closeLightbox}
             className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
-            aria-label="Tutup"
+            aria-label={t("Tutup", "Close")}
           >
             <X className="w-8 h-8" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
             className="absolute left-4 text-white/70 hover:text-white transition-colors z-10"
-            aria-label="Sebelumnya"
+            aria-label={t("Sebelumnya", "Previous")}
           >
             <ChevronLeft className="w-10 h-10" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
             className="absolute right-4 text-white/70 hover:text-white transition-colors z-10"
-            aria-label="Berikutnya"
+            aria-label={t("Berikutnya", "Next")}
           >
             <ChevronRight className="w-10 h-10" />
           </button>
           <img
             src={images[lightboxIdx].src.replace("w=600", "w=1200")}
-            alt={images[lightboxIdx].alt}
+            alt={getField(images[lightboxIdx], "alt", lang)}
             className="max-w-full max-h-[80vh] object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
           <p className="absolute bottom-6 text-white/70 text-sm">
-            {images[lightboxIdx].alt}
+            {getField(images[lightboxIdx], "alt", lang)}
           </p>
         </div>
       )}

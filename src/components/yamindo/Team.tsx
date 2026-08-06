@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Facebook, Twitter, Instagram, Linkedin, Quote } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { useLang, getField } from "@/lib/i18n";
 
-interface TeamMember {
-  id: number;
+interface TeamMemberItem {
+  id: string;
   name: string;
+  en_name: string;
   role: string;
+  en_role: string;
   bio: string;
+  en_bio: string;
   image: string;
   active: boolean;
 }
@@ -19,7 +23,8 @@ const socialLinks = [
   { icon: Linkedin, href: "#", label: "LinkedIn" },
 ];
 
-export default function Team({ members }: { members: TeamMember[] }) {
+export default function Team({ members }: { members: TeamMemberItem[] }) {
+  const { lang, t } = useLang();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
@@ -29,14 +34,14 @@ export default function Team({ members }: { members: TeamMember[] }) {
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
-            Tim Kami
+            {t("Tim Kami", "Our Team")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Tim Inti Yamindo
+            {t("Tim Inti Yamindo", "Yamindo Core Team")}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Para profesional berdedikasi yang menggerakkan misi kemanusiaan Yamindo
+            {t("Para profesional berdedikasi yang menggerakkan misi kemanusiaan Yamindo", "Dedicated professionals driving Yamindo's humanitarian mission")}
           </p>
         </div>
 
@@ -52,7 +57,7 @@ export default function Team({ members }: { members: TeamMember[] }) {
               <div className="relative h-56 overflow-hidden">
                 <img
                   src={member.image}
-                  alt={member.name}
+                  alt={getField(member, "name", lang)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div
@@ -75,10 +80,10 @@ export default function Team({ members }: { members: TeamMember[] }) {
                 </div>
               </div>
               <div className="p-5 text-center">
-                <h3 className="font-bold text-foreground">{member.name}</h3>
-                <p className="text-sm text-[var(--yamindo-teal)] mt-1">{member.role}</p>
+                <h3 className="font-bold text-foreground">{getField(member, "name", lang)}</h3>
+                <p className="text-sm text-[var(--yamindo-teal)] mt-1">{getField(member, "role", lang)}</p>
                 <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  {member.bio}
+                  {getField(member, "bio", lang)}
                 </p>
               </div>
             </div>

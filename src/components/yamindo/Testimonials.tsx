@@ -2,19 +2,25 @@
 
 import { useState } from "react";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { useLang, getField } from "@/lib/i18n";
 
 interface TestimonialItem {
-  id: number;
+  id: string;
   name: string;
+  en_name: string;
   role: string;
+  en_role: string;
   text: string;
+  en_text: string;
   image: string;
   rating: number;
   tag: string;
+  en_tag: string;
   active: boolean;
 }
 
 export default function Testimonials({ testimonials }: { testimonials: TestimonialItem[] }) {
+  const { lang, t } = useLang();
   const [current, setCurrent] = useState(0);
 
   if (testimonials.length === 0) return null;
@@ -22,7 +28,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
   const next = () => setCurrent((c) => (c + 1) % testimonials.length);
   const prev = () => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
 
-  const t = testimonials[current];
+  const item = testimonials[current];
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -31,14 +37,14 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
-            Testimoni
+            {t("Testimoni", "Testimonials")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Apa Kata Mereka Tentang Kami
+            {t("Apa Kata Mereka Tentang Kami", "What They Say About Us")}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Pendapat dari para donatur, mitra, dan penerima manfaat program Yamindo
+            {t("Pendapat dari para donatur, mitra, dan penerima manfaat program Yamindo", "Opinions from donors, partners, and beneficiaries of Yamindo's programs")}
           </p>
         </div>
 
@@ -49,33 +55,33 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
             
             <div className="flex flex-col md:flex-row gap-6 items-start">
               <img
-                src={t.image}
-                alt={t.name}
+                src={item.image}
+                alt={getField(item, "name", lang)}
                 className="w-20 h-20 rounded-xl object-cover flex-shrink-0 shadow-md"
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-medium text-[var(--yamindo-teal)] bg-[var(--yamindo-teal-light)] px-3 py-1 rounded-full">
-                    {t.tag}
+                    {getField(item, "tag", lang)}
                   </span>
                 </div>
                 <p className="text-foreground/80 leading-relaxed mb-4 italic">
-                  &ldquo;{t.text}&rdquo;
+                  &ldquo;{getField(item, "text", lang)}&rdquo;
                 </p>
                 <div className="flex items-center gap-1 mb-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
                       className={`w-4 h-4 ${
-                        i < t.rating
+                        i < item.rating
                           ? "text-amber-400 fill-amber-400"
                           : "text-gray-300"
                       }`}
                     />
                   ))}
                 </div>
-                <p className="font-bold text-foreground">{t.name}</p>
-                <p className="text-sm text-muted-foreground">{t.role}</p>
+                <p className="font-bold text-foreground">{getField(item, "name", lang)}</p>
+                <p className="text-sm text-muted-foreground">{getField(item, "role", lang)}</p>
               </div>
             </div>
           </div>
@@ -85,7 +91,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
             <button
               onClick={prev}
               className="w-10 h-10 rounded-full border border-border hover:border-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] flex items-center justify-center transition-colors"
-              aria-label="Sebelumnya"
+              aria-label={t("Sebelumnya", "Previous")}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -99,14 +105,14 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
                       ? "w-8 bg-[var(--yamindo-teal)]"
                       : "w-2 bg-[var(--yamindo-teal)]/30"
                   }`}
-                  aria-label={`Testimoni ${idx + 1}`}
+                  aria-label={`Testimonial ${idx + 1}`}
                 />
               ))}
             </div>
             <button
               onClick={next}
               className="w-10 h-10 rounded-full border border-border hover:border-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] flex items-center justify-center transition-colors"
-              aria-label="Berikutnya"
+              aria-label={t("Berikutnya", "Next")}
             >
               <ChevronRight className="w-5 h-5" />
             </button>

@@ -1,4 +1,7 @@
+"use client";
+
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Phone, Mail } from "lucide-react";
+import { useLang, getField } from "@/lib/i18n";
 
 const socialLinks = [
   { icon: Facebook, href: "#", label: "Facebook" },
@@ -13,7 +16,9 @@ interface TopBarProps {
 }
 
 export default function TopBar({ siteConfig = {} }: TopBarProps) {
-  const welcome = siteConfig.topbar_welcome || "Selamat Datang di Yamindo";
+  const { lang } = useLang();
+  const welcome = siteConfig[`topbar_welcome`] || "Selamat Datang di Yamindo";
+  const welcomeEn = siteConfig[`en_topbar_welcome`] || "Welcome to Yamindo";
   const phone = siteConfig.phone || "+62 21 1234 5678";
   const email = siteConfig.email || "info@yamindo.or.id";
 
@@ -21,7 +26,7 @@ export default function TopBar({ siteConfig = {} }: TopBarProps) {
     <div className="bg-[var(--yamindo-teal-dark)] text-white text-sm py-2 hidden lg:block">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <p className="flex items-center gap-2">
-          <span className="opacity-90">{welcome}</span>
+          <span className="opacity-90">{lang === "en" && welcomeEn ? welcomeEn : welcome}</span>
         </p>
         <div className="flex items-center gap-4">
           <a href="#" className="flex items-center gap-1.5 hover:text-amber-300 transition-colors">

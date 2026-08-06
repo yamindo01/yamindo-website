@@ -1,19 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, DollarSign, HandHeart } from "lucide-react";
+import { Heart, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLang, getField } from "@/lib/i18n";
 
 interface PresetItem {
-  id: number;
+  id: string;
   label: string;
+  en_label: string;
   amount: number | null;
   order: number;
   active: boolean;
 }
 
 export default function DonationCta({ presets }: { presets: PresetItem[] }) {
+  const { lang, t } = useLang();
   const [selectedIdx, setSelectedIdx] = useState(1);
   const [customAmount, setCustomAmount] = useState("");
 
@@ -27,14 +30,14 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
             <HandHeart className="w-4 h-4" />
-            Mulai Berdonasi
+            {t("Mulai Berdonasi", "Start Donating")}
             <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Siap Membantu Masyarakat Indonesia?
+            {t("Siap Membantu Masyarakat Indonesia?", "Ready to Help Indonesian Communities?")}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Setiap rupiah yang Anda donasikan akan disalurkan secara transparan kepada mereka yang membutuhkan
+            {t("Setiap rupiah yang Anda donasikan akan disalurkan secara transparan kepada mereka yang membutuhkan", "Every rupiah you donate will be distributed transparently to those in need")}
           </p>
         </div>
 
@@ -44,10 +47,10 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
               <button className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-[var(--yamindo-teal)] text-white">
-                Sekali Donasi
+                {t("Sekali Donasi", "One-time Donation")}
               </button>
               <button className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
-                Donasi Rutin
+                {t("Donasi Rutin", "Recurring Donation")}
               </button>
             </div>
 
@@ -63,7 +66,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
                       : "border-border hover:border-[var(--yamindo-teal)]/50 text-foreground"
                   }`}
                 >
-                  {preset.label}
+                  {getField(preset, "label", lang)}
                 </button>
               ))}
             </div>
@@ -77,7 +80,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
                   </span>
                   <Input
                     type="number"
-                    placeholder="Masukkan jumlah donasi"
+                    placeholder={t("Masukkan jumlah donasi", "Enter donation amount")}
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
                     className="pl-10 rounded-xl"
@@ -89,7 +92,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
             {/* Name Input */}
             <div className="mb-4">
               <Input
-                placeholder="Nama lengkap Anda (opsional)"
+                placeholder={t("Nama lengkap Anda (opsional)", "Your full name (optional)")}
                 className="rounded-xl"
               />
             </div>
@@ -98,7 +101,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
             <div className="mb-6">
               <Input
                 type="email"
-                placeholder="Email Anda (opsional)"
+                placeholder={t("Email Anda (opsional)", "Your email (optional)")}
                 className="rounded-xl"
               />
             </div>
@@ -108,11 +111,11 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
               className="w-full bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-xl py-6 text-lg font-semibold shadow-lg shadow-orange-200"
             >
               <Heart className="w-5 h-5 mr-2 fill-white" />
-              Donasi Sekarang
+              {t("Donasi Sekarang", "Donate Now")}
             </Button>
 
             <p className="text-center text-xs text-muted-foreground mt-3">
-              Donasi Anda aman dan terjamin. Yamindo bersertifikat ISO 9001:2015.
+              {t("Donasi Anda aman dan terjamin. Yamindo bersertifikat ISO 9001:2015.", "Your donation is safe and guaranteed. Yamindo is ISO 9001:2015 certified.")}
             </p>
           </div>
         </div>

@@ -3,20 +3,26 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLang, getField, getBullets } from "@/lib/i18n";
 
 interface SlideItem {
-  id: number;
+  id: string;
   title: string;
+  en_title: string;
   subtitle: string;
+  en_subtitle: string;
   description: string;
+  en_description: string;
   image: string;
-  bullets: string[];
+  bullets: string;
+  en_bullets: string;
   bgGradient: string;
   order: number;
   active: boolean;
 }
 
 export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
+  const { lang, t } = useLang();
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -46,6 +52,10 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
   if (slides.length === 0) return null;
 
   const slide = slides[current];
+  const title = getField(slide, "title", lang);
+  const subtitle = getField(slide, "subtitle", lang);
+  const description = getField(slide, "description", lang);
+  const bullets = getBullets(slide, lang);
 
   return (
     <section id="beranda" className="relative overflow-hidden">
@@ -67,17 +77,17 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
               <div className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-[var(--yamindo-coral)] fill-[var(--yamindo-coral)]" />
                 <span className="text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider">
-                  {slide.subtitle}
+                  {subtitle}
                 </span>
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground">
-                {slide.title}
+                {title}
               </h1>
               <p className="text-muted-foreground text-lg max-w-xl">
-                {slide.description}
+                {description}
               </p>
               <ul className="space-y-2">
-                {slide.bullets.map((bullet) => (
+                {bullets.map((bullet) => (
                   <li
                     key={bullet}
                     className="flex items-center gap-2 text-foreground/80"
@@ -95,7 +105,7 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
                   size="lg"
                   className="bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)] text-white rounded-full px-8 shadow-lg shadow-teal-200"
                 >
-                  <a href="#donasi">Donasi Sekarang</a>
+                  <a href="#donasi">{t("Donasi Sekarang", "Donate Now")}</a>
                 </Button>
                 <Button
                   asChild
@@ -103,7 +113,7 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
                   size="lg"
                   className="rounded-full px-8 border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)]"
                 >
-                  <a href="#tentang">Pelajari Lebih Lanjut</a>
+                  <a href="#tentang">{t("Pelajari Lebih Lanjut", "Learn More")}</a>
                 </Button>
               </div>
             </div>
@@ -118,7 +128,7 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src={slide.image}
-                  alt={slide.title}
+                  alt={title}
                   className="w-full h-[350px] md:h-[450px] lg:h-[500px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--yamindo-teal)]/20 to-transparent" />
@@ -127,13 +137,13 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
               <div className="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 bg-white rounded-xl shadow-xl p-4 md:p-5">
                 <p className="text-2xl md:text-3xl font-bold text-[var(--yamindo-teal)]">15K+</p>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Penerima Manfaat
+                  {t("Penerima Manfaat", "Beneficiaries")}
                 </p>
               </div>
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 bg-[var(--yamindo-coral)] rounded-xl shadow-xl p-4 md:p-5 text-white">
                 <p className="text-2xl md:text-3xl font-bold">50+</p>
                 <p className="text-xs md:text-sm opacity-90">
-                  Kota Terjangkau
+                  {t("Kota Terjangkau", "Cities Reached")}
                 </p>
               </div>
             </div>
@@ -146,7 +156,7 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
         <button
           onClick={prevSlide}
           className="w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-105"
-          aria-label="Slide sebelumnya"
+          aria-label={t("Slide sebelumnya", "Previous slide")}
         >
           <ChevronLeft className="w-5 h-5 text-foreground" />
         </button>
@@ -167,7 +177,7 @@ export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
         <button
           onClick={nextSlide}
           className="w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-105"
-          aria-label="Slide berikutnya"
+          aria-label={t("Slide berikutnya", "Next slide")}
         >
           <ChevronRight className="w-5 h-5 text-foreground" />
         </button>
