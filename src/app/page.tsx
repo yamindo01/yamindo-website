@@ -13,7 +13,6 @@ import Blog from "@/components/yamindo/Blog";
 import Partners from "@/components/yamindo/Partners";
 import Footer from "@/components/yamindo/Footer";
 import AdminPanel from "@/components/yamindo/AdminPanel";
-import { LangProvider } from "@/lib/i18n";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -73,8 +72,7 @@ export default async function Home() {
   const content = await getContent();
 
   return (
-    <LangProvider>
-      <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
         <TopBar siteConfig={content.siteConfig} />
         <Header />
         <main className="flex-1">
@@ -92,7 +90,6 @@ export default async function Home() {
         </main>
         <Footer siteConfig={content.siteConfig} events={content.footerEvents} />
         <AdminPanel />
-      </div>
-    </LangProvider>
+    </div>
   );
 }

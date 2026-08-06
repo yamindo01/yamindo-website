@@ -197,3 +197,107 @@ model DonationPreset {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ========== Sub-Page Models (Bilingual) ==========
+
+model AboutSection {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  en_title    String   @default("")
+  content     String
+  en_content  String   @default("")
+  image       String   @default("")
+  items       String   @default("[]")
+  en_items    String   @default("[]")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ServiceDetail {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  en_title      String   @default("")
+  short_desc    String
+  en_short_desc String   @default("")
+  content       String
+  en_content    String   @default("")
+  image         String
+  icon          String   @default("Heart")
+  features      String   @default("[]")
+  en_features   String   @default("[]")
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ProgramDetail {
+  id              String   @id @default(cuid())
+  title           String
+  en_title        String   @default("")
+  description     String
+  en_description  String   @default("")
+  image           String
+  category        String
+  en_category     String   @default("")
+  raised          String   @default("Rp 0")
+  goal            String   @default("Rp 0")
+  percent         Int      @default(0)
+  status          String   @default("active")
+  order           Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model GalleryPageItem {
+  id          String   @id @default(cuid())
+  type        String   @default("photo")
+  src         String
+  thumbnail   String   @default("")
+  alt         String
+  en_alt      String   @default("")
+  category    String   @default("")
+  en_category String   @default("")
+  video_url   String   @default("")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NewsArticle {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  en_title        String   @default("")
+  category        String
+  en_category     String   @default("")
+  content         String
+  en_content      String   @default("")
+  excerpt         String
+  en_excerpt      String   @default("")
+  image           String
+  author          String   @default("")
+  date            String
+  featured        Boolean  @default(false)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

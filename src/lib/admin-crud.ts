@@ -14,6 +14,13 @@ const ALLOWED_MODELS = [
   "footerEvent",
   "aboutInfo",
   "donationPreset",
+  // Sub-page models
+  "aboutSection",
+  "serviceDetail",
+  "programDetail",
+  "galleryPageItem",
+  "newsArticle",
+  "contactMessage",
 ] as const;
 
 type ModelName = (typeof ALLOWED_MODELS)[number];
@@ -32,6 +39,12 @@ function getModel(model: string) {
     footerEvent: db.footerEvent,
     aboutInfo: db.aboutInfo,
     donationPreset: db.donationPreset,
+    aboutSection: db.aboutSection,
+    serviceDetail: db.serviceDetail,
+    programDetail: db.programDetail,
+    galleryPageItem: db.galleryPageItem,
+    newsArticle: db.newsArticle,
+    contactMessage: db.contactMessage,
   };
   return models[model];
 }

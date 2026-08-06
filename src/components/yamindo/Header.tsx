@@ -12,14 +12,14 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: t("Beranda", "Home"), href: "#beranda" },
-    { label: t("Tentang", "About"), href: "#tentang" },
-    { label: t("Layanan", "Services"), href: "#layanan" },
-    { label: t("Program", "Programs"), href: "#program" },
-    { label: t("Tim", "Team"), href: "#tim" },
-    { label: t("Galeri", "Gallery"), href: "#galeri" },
-    { label: t("Berita", "News"), href: "#berita" },
-    { label: t("Kontak", "Contact"), href: "#kontak" },
+    { label: t("Beranda", "Home"), href: "/" },
+    { label: t("Tentang", "About"), href: "/tentang" },
+    { label: t("Layanan", "Services"), href: "/layanan" },
+    { label: t("Program", "Programs"), href: "/program" },
+    { label: t("Tim", "Team"), href: "/tim" },
+    { label: t("Galeri", "Gallery"), href: "/galeri" },
+    { label: t("Berita", "News"), href: "/berita" },
+    { label: t("Kontak", "Contact"), href: "/kontak" },
   ];
 
   useEffect(() => {
@@ -31,12 +31,14 @@ export default function Header() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsMobileMenuOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
     }
+    setIsMobileMenuOpen(false);
   };
 
   return (
