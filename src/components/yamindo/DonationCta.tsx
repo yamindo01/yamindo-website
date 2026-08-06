@@ -5,11 +5,19 @@ import { Heart, DollarSign, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const presetAmounts = ["Rp 50.000", "Rp 100.000", "Rp 250.000", "Rp 500.000", "Rp 1.000.000", "Custom"];
+interface PresetItem {
+  id: number;
+  label: string;
+  amount: number | null;
+  order: number;
+  active: boolean;
+}
 
-export default function DonationCta() {
-  const [selectedAmount, setSelectedAmount] = useState(1);
+export default function DonationCta({ presets }: { presets: PresetItem[] }) {
+  const [selectedIdx, setSelectedIdx] = useState(1);
   const [customAmount, setCustomAmount] = useState("");
+
+  const customPresetIdx = presets.findIndex((p) => p.amount === null);
 
   return (
     <section id="donasi" className="py-16 md:py-24 bg-gradient-soft">
@@ -45,23 +53,23 @@ export default function DonationCta() {
 
             {/* Amount Selection */}
             <div className="grid grid-cols-3 gap-3 mb-4">
-              {presetAmounts.map((amount, idx) => (
+              {presets.map((preset, idx) => (
                 <button
-                  key={amount}
-                  onClick={() => setSelectedAmount(idx)}
+                  key={preset.id}
+                  onClick={() => setSelectedIdx(idx)}
                   className={`py-3 rounded-xl text-sm font-medium transition-all border-2 ${
-                    selectedAmount === idx
+                    selectedIdx === idx
                       ? "border-[var(--yamindo-teal)] bg-[var(--yamindo-teal-light)] text-[var(--yamindo-teal-dark)]"
                       : "border-border hover:border-[var(--yamindo-teal)]/50 text-foreground"
                   }`}
                 >
-                  {amount}
+                  {preset.label}
                 </button>
               ))}
             </div>
 
             {/* Custom Amount Input */}
-            {selectedAmount === 5 && (
+            {selectedIdx === customPresetIdx && (
               <div className="mb-4">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">

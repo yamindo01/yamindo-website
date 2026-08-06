@@ -1,15 +1,12 @@
-"use client";
+interface PartnerItem {
+  id: number;
+  name: string;
+  logo: string;
+  order: number;
+  active: boolean;
+}
 
-const partners = [
-  { name: "Kemenkes RI", logo: "🏥" },
-  { name: "Kemendikbud", logo: "📚" },
-  { name: "UNICEF", logo: "🇺🇳" },
-  { name: "WHO Indonesia", logo: "🌍" },
-  { name: "Bank Indonesia", logo: "🏦" },
-  { name: "Aksi Cepat Tanggap", logo: "🤝" },
-];
-
-export default function Partners() {
+export default function Partners({ partners }: { partners: PartnerItem[] }) {
   return (
     <section className="py-12 md:py-16 bg-muted">
       <div className="max-w-7xl mx-auto px-4">
@@ -26,11 +23,10 @@ export default function Partners() {
         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
           {partners.map((partner) => (
             <div
-              key={partner.name}
+              key={partner.id}
               className="flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
             >
-              <span className="text-2xl">{partner.logo}</span>
-              <span className="text-sm font-medium text-foreground/70">{partner.name}</span>
+              <span className="text-sm font-semibold text-[var(--yamindo-teal)]">{partner.name}</span>
             </div>
           ))}
         </div>

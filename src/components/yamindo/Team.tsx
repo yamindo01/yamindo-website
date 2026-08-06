@@ -3,32 +3,14 @@
 import { useState } from "react";
 import { Facebook, Twitter, Instagram, Linkedin, Quote } from "lucide-react";
 
-const teamMembers = [
-  {
-    name: "Dr. Yasir Amin",
-    role: "Pendiri & Ketua Yayasan",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&q=80",
-    bio: "Visioner yang telah mengabdikan hidupnya untuk kesejahteraan masyarakat Indonesia.",
-  },
-  {
-    name: "Hj. Siti Aminah",
-    role: "Direktur Eksekutif",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80",
-    bio: "Pemimpin berpengalaman dalam manajemen organisasi nonprofit dan pengembangan masyarakat.",
-  },
-  {
-    name: "Ahmad Fauzi, M.Pd",
-    role: "Koordinator Pendidikan",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80",
-    bio: "Pendidik berdedikasi yang memastikan setiap anak mendapat akses pendidikan berkualitas.",
-  },
-  {
-    name: "dr. Rina Handayani",
-    role: "Koordinator Kesehatan",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80",
-    bio: "Dokter yang berdedikasi untuk memberikan layanan kesehatan bagi masyarakat terpencil.",
-  },
-];
+interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  bio: string;
+  image: string;
+  active: boolean;
+}
 
 const socialLinks = [
   { icon: Facebook, href: "#", label: "Facebook" },
@@ -37,7 +19,7 @@ const socialLinks = [
   { icon: Linkedin, href: "#", label: "LinkedIn" },
 ];
 
-export default function Team() {
+export default function Team({ members }: { members: TeamMember[] }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
@@ -60,9 +42,9 @@ export default function Team() {
 
         {/* Team Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {teamMembers.map((member, idx) => (
+          {members.map((member, idx) => (
             <div
-              key={member.name}
+              key={member.id}
               className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               onMouseEnter={() => setHoveredIdx(idx)}
               onMouseLeave={() => setHoveredIdx(null)}

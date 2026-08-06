@@ -1,42 +1,34 @@
-"use client";
-
 import { CheckCircle, ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
-const aboutBullets = [
-  "Memberdayakan masyarakat melalui pendidikan berkualitas",
-  "Program kesehatan gratis untuk daerah terpencil",
-];
+interface AboutInfo {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  badge: string;
+  bullets: string[];
+}
 
-const causes = [
-  {
-    title: "Air Bersih untuk Desa Tertinggal",
-    description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.",
-    raised: "Rp 45.000.000",
-    goal: "Rp 100.000.000",
-    percent: 45,
-    image: "https://images.unsplash.com/photo-1541544181051-e46607bc22a9?w=400&q=80",
-  },
-  {
-    title: "Beasiswa Anak Nusantara",
-    description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.",
-    raised: "Rp 78.500.000",
-    goal: "Rp 150.000.000",
-    percent: 52,
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80",
-  },
-  {
-    title: "Bantuan Bencana Alam",
-    description: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.",
-    raised: "Rp 120.000.000",
-    goal: "Rp 200.000.000",
-    percent: 60,
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=400&q=80",
-  },
-];
+interface CauseItem {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  raised: string;
+  goal: string;
+  percent: number;
+  active: boolean;
+}
 
-export default function AboutCauses() {
+export default function AboutCauses({
+  aboutInfo,
+  causes,
+}: {
+  aboutInfo: AboutInfo | null;
+  causes: CauseItem[];
+}) {
   return (
     <section id="program" className="py-16 md:py-24 bg-gradient-soft">
       <div className="max-w-7xl mx-auto px-4">
@@ -60,31 +52,33 @@ export default function AboutCauses() {
           <div className="lg:col-span-2 space-y-6">
             <div className="relative rounded-2xl overflow-hidden shadow-lg">
               <img
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80"
-                alt="Tentang Yamindo"
+                src={aboutInfo?.image || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80"}
+                alt={aboutInfo?.title || "Tentang Yamindo"}
                 className="w-full h-64 object-cover"
               />
-              <div className="absolute bottom-4 left-4 bg-[var(--yamindo-teal)] text-white px-4 py-2 rounded-lg text-sm font-bold">
-                Sejak 2010
-              </div>
+              {aboutInfo?.badge && (
+                <div className="absolute bottom-4 left-4 bg-[var(--yamindo-teal)] text-white px-4 py-2 rounded-lg text-sm font-bold">
+                  {aboutInfo.badge}
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-xl font-bold text-foreground mb-3">
-                Tentang Yamindo
+                {aboutInfo?.title || "Tentang Yamindo"}
               </h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                Yayasan Yasir Amin Indonesia (Yamindo) didirikan dengan visi untuk menciptakan
-                Indonesia yang lebih adil dan sejahtera. Kami berkomitmen untuk memberikan
-                bantuan langsung kepada masyarakat yang membutuhkan.
+                {aboutInfo?.description || "Yayasan Yasir Amin Indonesia (Yamindo) didirikan dengan visi untuk menciptakan Indonesia yang lebih adil dan sejahtera."}
               </p>
-              <ul className="space-y-3">
-                {aboutBullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2 text-sm text-foreground/80">
-                    <CheckCircle className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0 mt-0.5" />
-                    {bullet}
-                  </li>
-                ))}
-              </ul>
+              {(aboutInfo?.bullets || []).length > 0 && (
+                <ul className="space-y-3">
+                  {(aboutInfo?.bullets || []).map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2 text-sm text-foreground/80">
+                      <CheckCircle className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0 mt-0.5" />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+              )}
               <Button
                 asChild
                 variant="outline"
@@ -100,9 +94,9 @@ export default function AboutCauses() {
 
           {/* Causes Column */}
           <div className="lg:col-span-3 space-y-6">
-            {causes.map((cause, idx) => (
+            {causes.map((cause) => (
               <div
-                key={idx}
+                key={cause.id}
                 className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
               >
                 <div className="flex flex-col sm:flex-row">

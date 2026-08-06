@@ -4,37 +4,19 @@ import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const slides = [
-  {
-    subtitle: "Membangun Harapan",
-    title: "Mengulurkan Tangan untuk Indonesia yang Lebih Baik",
-    description:
-      "Yamindo hadir untuk memberdayakan masyarakat melalui program pendidikan, kesehatan, dan bantuan sosial bagi mereka yang membutuhkan di seluruh Indonesia.",
-    bullets: ["Pendidikan Berkualitas", "Kesehatan Masyarakat", "Pemberdayaan Ekonomi"],
-    bgGradient: "from-teal-50 via-amber-50/30 to-orange-50",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
-  },
-  {
-    subtitle: "Bersama Kita Bisa",
-    title: "Mewujudkan Generasi Indonesia yang Cerdas dan Sehat",
-    description:
-      "Dengan dukungan para dermawan dan relawan, kami terus bergerak maju untuk menciptakan perubahan nyata di kehidupan masyarakat.",
-    bullets: ["Program Relawan", "Bantuan Bencana", "Sponsor Anak"],
-    bgGradient: "from-amber-50 via-teal-50/30 to-green-50",
-    image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&q=80",
-  },
-  {
-    subtitle: "Peduli & Berbagi",
-    title: "Setiap Donasi Anda Adalah Harapan Baru",
-    description:
-      "Bergabunglah bersama ribuan dermawan yang telah berkontribusi dalam membangun masa depan yang lebih cerah untuk anak-anak Indonesia.",
-    bullets: ["Transparan & Akuntabel", "Jangkauan Nasional", "Dampak Nyata"],
-    bgGradient: "from-green-50 via-amber-50/30 to-teal-50",
-    image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80",
-  },
-];
+interface SlideItem {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  bullets: string[];
+  bgGradient: string;
+  order: number;
+  active: boolean;
+}
 
-export default function HeroSlider() {
+export default function HeroSlider({ slides }: { slides: SlideItem[] }) {
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -50,16 +32,18 @@ export default function HeroSlider() {
 
   const nextSlide = useCallback(() => {
     goToSlide((current + 1) % slides.length);
-  }, [current, goToSlide]);
+  }, [current, goToSlide, slides.length]);
 
   const prevSlide = useCallback(() => {
     goToSlide((current - 1 + slides.length) % slides.length);
-  }, [current, goToSlide]);
+  }, [current, goToSlide, slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
     return () => clearInterval(timer);
   }, [nextSlide]);
+
+  if (slides.length === 0) return null;
 
   const slide = slides[current];
 

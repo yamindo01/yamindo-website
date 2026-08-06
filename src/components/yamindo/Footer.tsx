@@ -2,6 +2,13 @@
 
 import { Heart, Phone, Mail, MapPin, ArrowUp, Facebook, Twitter, Instagram, Linkedin, Youtube, Calendar } from "lucide-react";
 
+interface EventItem {
+  id: number;
+  date: string;
+  title: string;
+  active: boolean;
+}
+
 const quickLinks = [
   { label: "Tentang Kami", href: "#tentang" },
   { label: "Program Donasi", href: "#program" },
@@ -9,12 +16,6 @@ const quickLinks = [
   { label: "Galeri Kegiatan", href: "#galeri" },
   { label: "Berita & Artikel", href: "#berita" },
   { label: "Hubungi Kami", href: "#kontak" },
-];
-
-const events = [
-  { date: "15 Agustus 2026", title: "Bakti Sosial HUT RI" },
-  { date: "5 September 2026", title: "Seminar Kesehatan Masyarakat" },
-  { date: "20 Oktober 2026", title: "Gala Donasi Tahunan" },
 ];
 
 const socialLinks = [
@@ -25,10 +26,20 @@ const socialLinks = [
   { icon: Youtube, href: "#", label: "YouTube" },
 ];
 
-export default function Footer() {
+export default function Footer({
+  siteConfig,
+  events,
+}: {
+  siteConfig: Record<string, string>;
+  events: EventItem[];
+}) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const phone = siteConfig.phone || "+62 21 1234 5678";
+  const email = siteConfig.email || "info@yamindo.or.id";
+  const address = siteConfig.address || "Jl. Kebahagiaan No. 45, Jakarta Selatan, DKI Jakarta 12345";
 
   return (
     <footer id="kontak" className="relative">
@@ -89,7 +100,7 @@ export default function Footer() {
               <h4 className="font-bold mb-4 text-white">Acara Mendatang</h4>
               <ul className="space-y-3">
                 {events.map((event) => (
-                  <li key={event.title} className="flex items-start gap-3">
+                  <li key={event.id} className="flex items-start gap-3">
                     <span className="w-12 h-12 bg-[var(--yamindo-teal)]/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Calendar className="w-5 h-5 text-[var(--yamindo-teal)]" />
                     </span>
@@ -109,19 +120,19 @@ export default function Footer() {
                 <li className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white/60">
-                    Jl. Kebahagiaan No. 45, Jakarta Selatan, DKI Jakarta 12345
+                    {address}
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0" />
-                  <a href="tel:+622112345678" className="text-sm text-white/60 hover:text-white transition-colors">
-                    +62 21 1234 5678
+                  <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-sm text-white/60 hover:text-white transition-colors">
+                    {phone}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0" />
-                  <a href="mailto:info@yamindo.or.id" className="text-sm text-white/60 hover:text-white transition-colors">
-                    info@yamindo.or.id
+                  <a href={`mailto:${email}`} className="text-sm text-white/60 hover:text-white transition-colors">
+                    {email}
                   </a>
                 </li>
               </ul>

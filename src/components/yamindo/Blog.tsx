@@ -1,33 +1,17 @@
-"use client";
-
 import { Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const blogPosts = [
-  {
-    title: "Yamindo Salurkan Bantuan untuk Korban Bencana Alam NTT",
-    category: "Bantuan Bencana",
-    date: "15 Juli 2026",
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=500&q=80",
-    excerpt: "Tim Yamindo langsung bergerak ke lokasi bencana untuk menyalurkan bantuan logistik dan medis kepada korban bencana alam di Nusa Tenggara Timur.",
-  },
-  {
-    title: "Program Beasiswa Anak Nusantara Resmi Diluncurkan",
-    category: "Pendidikan",
-    date: "8 Juli 2026",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&q=80",
-    excerpt: "Program beasiswa baru ini menargetkan 1.000 anak dari keluarga kurang mampu di 20 provinsi untuk mendapatkan akses pendidikan yang layak.",
-  },
-  {
-    title: "Kolaborasi dengan Pemerintah Daerah untuk Program Air Bersih",
-    category: "Air Bersih",
-    date: "1 Juli 2026",
-    image: "https://images.unsplash.com/photo-1541544181051-e46607bc22a9?w=500&q=80",
-    excerpt: "Kerjasama strategis dengan pemerintah daerah untuk membangun infrastruktur air bersih di 50 desa yang masih kekurangan akses air bersih.",
-  },
-];
+interface BlogPost {
+  id: number;
+  title: string;
+  category: string;
+  date: string;
+  image: string;
+  excerpt: string;
+  active: boolean;
+}
 
-export default function Blog() {
+export default function Blog({ posts }: { posts: BlogPost[] }) {
   return (
     <section id="berita" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4">
@@ -45,9 +29,9 @@ export default function Blog() {
 
         {/* Blog Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogPosts.map((post, idx) => (
+          {posts.map((post) => (
             <article
-              key={idx}
+              key={post.id}
               className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
             >
               <div className="relative h-48 overflow-hidden">

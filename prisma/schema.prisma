@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -28,5 +22,151 @@ model Post {
   published Boolean  @default(false)
   authorId  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== Yamindo CMS Models ==========
+
+model SiteConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroSlide {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String
+  description String
+  image       String
+  bullets     String
+  bgGradient  String   @default("from-teal-50 via-amber-50/30 to-orange-50")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String
+  icon        String   @default("GraduationCap")
+  color       String   @default("from-teal-400 to-teal-600")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cause {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String
+  raised      String
+  goal        String
+  percent     Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Counter {
+  id          String   @id @default(cuid())
+  label       String
+  value       Int
+  icon        String   @default("Users")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  bio         String
+  image       String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryImage {
+  id          String   @id @default(cuid())
+  src         String
+  alt         String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  text        String
+  image       String
+  rating      Int      @default(5)
+  tag         String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  date        String
+  image       String
+  excerpt     String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Partner {
+  id          String   @id @default(cuid())
+  name        String
+  logo        String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FooterEvent {
+  id          String   @id @default(cuid())
+  date        String
+  title       String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AboutInfo {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String
+  badge       String
+  bullets     String
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DonationPreset {
+  id          String   @id @default(cuid())
+  label       String
+  amount      Int?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

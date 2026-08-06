@@ -3,35 +3,21 @@
 import { useState } from "react";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
-const testimonials = [
-  {
-    name: "Budi Santoso",
-    role: "Donatur Tetap",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80",
-    text: "Saya sudah mendukung Yamindo selama 5 tahun. Transparansi dan dampak nyata dari program mereka membuat saya yakin bahwa donasi saya digunakan dengan baik. Sangat merekomendasikan!",
-    rating: 5,
-    tag: "Sangat Dipercaya",
-  },
-  {
-    name: "Hj. Fatimah Zahra",
-    role: "Ketua Komunitas Peduli",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&q=80",
-    text: "Kolaborasi dengan Yamindo telah membantu komunitas kami mendapatkan akses air bersih. Prosesnya profesional dan tim mereka sangat ramah serta responsif.",
-    rating: 5,
-    tag: "Mitra Terpercaya",
-  },
-  {
-    name: "Prof. Ahmad Dahlan",
-    role: "Akademisi & Aktivis",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80",
-    text: "Yamindo adalah salah satu yayasan yang benar-benar bekerja dari hati. Program pendidikan mereka telah mengubah hidup banyak anak di daerah terpencil Indonesia.",
-    rating: 5,
-    tag: "Berpengaruh",
-  },
-];
+interface TestimonialItem {
+  id: number;
+  name: string;
+  role: string;
+  text: string;
+  image: string;
+  rating: number;
+  tag: string;
+  active: boolean;
+}
 
-export default function Testimonials() {
+export default function Testimonials({ testimonials }: { testimonials: TestimonialItem[] }) {
   const [current, setCurrent] = useState(0);
+
+  if (testimonials.length === 0) return null;
 
   const next = () => setCurrent((c) => (c + 1) % testimonials.length);
   const prev = () => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);

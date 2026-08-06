@@ -3,32 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { Users, Globe, Baby, Home } from "lucide-react";
 
-const stats = [
-  {
-    icon: Users,
-    value: 15280,
-    label: "Relawan Aktif",
-    suffix: "",
-  },
-  {
-    icon: Globe,
-    value: 234,
-    label: "Mitra Global",
-    suffix: "",
-  },
-  {
-    icon: Baby,
-    value: 8450,
-    label: "Anak Terselamatkan",
-    suffix: "",
-  },
-  {
-    icon: Home,
-    value: 3200,
-    label: "Keluarga Dibantu",
-    suffix: "",
-  },
-];
+type LucideIcon = React.ComponentType<{ className?: string }>;
+
+const iconMap: Record<string, LucideIcon> = {
+  Users,
+  Globe,
+  Baby,
+  Home,
+};
+
+interface CounterItem {
+  id: number;
+  label: string;
+  value: number;
+  icon: string;
+  active: boolean;
+}
 
 function useCountUp(target: number, isActive: boolean) {
   const [count, setCount] = useState(0);
@@ -58,13 +48,14 @@ function useCountUp(target: number, isActive: boolean) {
   return count;
 }
 
-function StatCard({ stat, isVisible }: { stat: typeof stats[0]; isVisible: boolean }) {
+function StatCard({ stat, isVisible }: { stat: CounterItem; isVisible: boolean }) {
   const count = useCountUp(stat.value, isVisible);
+  const IconComponent = iconMap[stat.icon] || Users;
 
   return (
     <div className="text-center group">
       <div className="w-16 h-16 mx-auto mb-4 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-        <stat.icon className="w-8 h-8 text-white" />
+        <IconComponent className="w-8 h-8 text-white" />
       </div>
       <p className="text-3xl md:text-4xl font-bold text-white">
         {count.toLocaleString("id-ID")}
@@ -74,7 +65,7 @@ function StatCard({ stat, isVisible }: { stat: typeof stats[0]; isVisible: boole
   );
 }
 
-export default function Counter() {
+export default function Counter({ counters }: { counters: CounterItem[] }) {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -110,8 +101,8 @@ export default function Counter() {
       </div>
       <div className="relative max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} stat={stat} isVisible={isVisible} />
+          {counters.map((stat) => (
+            <StatCard key={stat.id} stat={stat} isVisible={isVisible} />
           ))}
         </div>
       </div>

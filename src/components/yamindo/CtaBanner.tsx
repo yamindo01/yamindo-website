@@ -1,9 +1,7 @@
-"use client";
-
 import { Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function CtaBanner() {
+export default function CtaBanner({ siteConfig }: { siteConfig: Record<string, string> }) {
   return (
     <section className="relative py-12 md:py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-[var(--yamindo-teal)] to-teal-500" />
@@ -19,10 +17,10 @@ export default function CtaBanner() {
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold">
-              Bergabunglah Dengan Tim Relawan Kami
+              {siteConfig.cta_title || "Bergabunglah Dengan Tim Relawan Kami"}
             </h2>
             <p className="text-white/80 mt-1">
-              Jadilah bagian dari perubahan nyata untuk Indonesia
+              {siteConfig.cta_subtitle || "Jadilah bagian dari perubahan nyata untuk Indonesia"}
             </p>
           </div>
         </div>
