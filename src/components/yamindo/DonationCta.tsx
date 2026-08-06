@@ -1,0 +1,114 @@
+"use client";
+
+import { useState } from "react";
+import { Heart, DollarSign, HandHeart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const presetAmounts = ["Rp 50.000", "Rp 100.000", "Rp 250.000", "Rp 500.000", "Rp 1.000.000", "Custom"];
+
+export default function DonationCta() {
+  const [selectedAmount, setSelectedAmount] = useState(1);
+  const [customAmount, setCustomAmount] = useState("");
+
+  return (
+    <section id="donasi" className="py-16 md:py-24 bg-gradient-soft">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
+            <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
+            <HandHeart className="w-4 h-4" />
+            Mulai Berdonasi
+            <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Siap Membantu Masyarakat Indonesia?
+          </h2>
+          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+            Setiap rupiah yang Anda donasikan akan disalurkan secara transparan kepada mereka yang membutuhkan
+          </p>
+        </div>
+
+        {/* Donation Card */}
+        <div className="max-w-xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6">
+              <button className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-[var(--yamindo-teal)] text-white">
+                Sekali Donasi
+              </button>
+              <button className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                Donasi Rutin
+              </button>
+            </div>
+
+            {/* Amount Selection */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {presetAmounts.map((amount, idx) => (
+                <button
+                  key={amount}
+                  onClick={() => setSelectedAmount(idx)}
+                  className={`py-3 rounded-xl text-sm font-medium transition-all border-2 ${
+                    selectedAmount === idx
+                      ? "border-[var(--yamindo-teal)] bg-[var(--yamindo-teal-light)] text-[var(--yamindo-teal-dark)]"
+                      : "border-border hover:border-[var(--yamindo-teal)]/50 text-foreground"
+                  }`}
+                >
+                  {amount}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Amount Input */}
+            {selectedAmount === 5 && (
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                    Rp
+                  </span>
+                  <Input
+                    type="number"
+                    placeholder="Masukkan jumlah donasi"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    className="pl-10 rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Name Input */}
+            <div className="mb-4">
+              <Input
+                placeholder="Nama lengkap Anda (opsional)"
+                className="rounded-xl"
+              />
+            </div>
+
+            {/* Email Input */}
+            <div className="mb-6">
+              <Input
+                type="email"
+                placeholder="Email Anda (opsional)"
+                className="rounded-xl"
+              />
+            </div>
+
+            {/* Donate Button */}
+            <Button
+              className="w-full bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-xl py-6 text-lg font-semibold shadow-lg shadow-orange-200"
+            >
+              <Heart className="w-5 h-5 mr-2 fill-white" />
+              Donasi Sekarang
+            </Button>
+
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              Donasi Anda aman dan terjamin. Yamindo bersertifikat ISO 9001:2015.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
