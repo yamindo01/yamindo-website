@@ -12,21 +12,25 @@ interface EventItem {
 }
 
 const quickLinksId = [
-  { label: "Tentang Kami", href: "#tentang" },
-  { label: "Program Donasi", href: "#program" },
-  { label: "Tim Kami", href: "#tim" },
-  { label: "Galeri Kegiatan", href: "#galeri" },
-  { label: "Berita & Artikel", href: "#berita" },
-  { label: "Hubungi Kami", href: "#kontak" },
+  { label: "Tentang Kami", href: "/tentang" },
+  { label: "Layanan Kami", href: "/layanan" },
+  { label: "Program Donasi", href: "/program" },
+  { label: "Tim Kami", href: "/tim" },
+  { label: "Gallery Photo", href: "/galeri#photo" },
+  { label: "Gallery Video", href: "/galeri#video" },
+  { label: "Berita & Artikel", href: "/berita" },
+  { label: "Hubungi Kami", href: "/kontak" },
 ];
 
 const quickLinksEn = [
-  { label: "About Us", href: "#tentang" },
-  { label: "Donation Programs", href: "#program" },
-  { label: "Our Team", href: "#tim" },
-  { label: "Activity Gallery", href: "#galeri" },
-  { label: "News & Articles", href: "#berita" },
-  { label: "Contact Us", href: "#kontak" },
+  { label: "About Us", href: "/tentang" },
+  { label: "Our Services", href: "/layanan" },
+  { label: "Donation Programs", href: "/program" },
+  { label: "Our Team", href: "/tim" },
+  { label: "Photo Gallery", href: "/galeri#photo" },
+  { label: "Video Gallery", href: "/galeri#video" },
+  { label: "News & Articles", href: "/berita" },
+  { label: "Contact Us", href: "/kontak" },
 ];
 
 const socialLinks = [
