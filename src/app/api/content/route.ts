@@ -59,8 +59,7 @@ export async function GET() {
       donationPresets,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("Content API error:", msg);
-    return NextResponse.json({ error: "Failed to load content", detail: msg }, { status: 500 });
+    console.error("Content API error:", error);
+    return NextResponse.json({ error: "Failed to load content" }, { status: 500 });
   }
 }
