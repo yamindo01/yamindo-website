@@ -315,3 +315,30 @@ model OrgMember {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model NavMenu {
+  id        String   @id @default(cuid())
+  label     String
+  en_label  String   @default("")
+  href      String   @default("/")
+  navKey    String   @default("")
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  children  NavMenuItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NavMenuItem {
+  id        String   @id @default(cuid())
+  parentId  String
+  label     String
+  en_label  String   @default("")
+  href      String   @default("/")
+  icon      String   @default("")
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  parent    NavMenu @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

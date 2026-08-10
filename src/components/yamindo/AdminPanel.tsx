@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 
 const ADMIN_TABS = [
+  { key: "nav-menus", label: "Menu Navigasi" },
   { key: "site-config", label: "Pengaturan" },
   { key: "hero-slides", label: "Hero Slider" },
   { key: "services", label: "Layanan" },
@@ -809,6 +810,219 @@ function SiteConfigManager() {
   );
 }
 
+// ====== Nav Menu Manager ======
+interface NavMenuWithChildren {
+  id: string;
+  label: string;
+  en_label: string;
+  href: string;
+  navKey: string;
+  order: number;
+  active: boolean;
+  children: {
+    id: string;
+    parentId: string;
+    label: string;
+    en_label: string;
+    href: string;
+    icon: string;
+    order: number;
+    active: boolean;
+  }[];
+}
+
+function NavMenuManager() {
+  const [menus, setMenus] = useState<NavMenuWithChildren[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingParent, setEditingParent] = useState<Partial<NavMenuWithChildren> | null>(null);
+  const [editingChild, setEditingChild] = useState<Partial<NavMenuWithChildren['children'][0]> & { parentId?: string } | null>(null);
+  const [expandedParent, setExpandedParent] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const fetchMenus = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/nav-menus');
+      if (res.ok) setMenus(await res.json());
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchMenus(); }, [fetchMenus]);
+
+  const handleSaveParent = async () => {
+    if (!editingParent) return;
+    setSaving(true);
+    try {
+      if (editingParent.id) {
+        const { id, children, ...data } = editingParent as NavMenuWithChildren;
+        await fetch('/api/admin/nav-menus', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...data }) });
+      } else {
+        await fetch('/api/admin/nav-menus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingParent) });
+      }
+      setEditingParent(null);
+      fetchMenus();
+    } catch (e) { console.error(e); }
+    setSaving(false);
+  };
+
+  const handleDeleteParent = async (id: string) => {
+    if (!confirm('Hapus menu ini beserta sub-menunya?')) return;
+    try {
+      await fetch('/api/admin/nav-menus', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      fetchMenus();
+    } catch (e) { console.error(e); }
+  };
+
+  const handleSaveChild = async () => {
+    if (!editingChild) return;
+    setSaving(true);
+    try {
+      if (editingChild.id) {
+        const { id, parentId, ...data } = editingChild;
+        await fetch('/api/admin/nav-menu-items', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...data }) });
+      } else {
+        await fetch('/api/admin/nav-menu-items', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ parentId: editingChild.parentId, label: editingChild.label || '', href: editingChild.href || '/', icon: editingChild.icon || '' }) });
+      }
+      setEditingChild(null);
+      fetchMenus();
+    } catch (e) { console.error(e); }
+    setSaving(false);
+  };
+
+  const handleDeleteChild = async (id: string) => {
+    if (!confirm('Hapus sub-menu ini?')) return;
+    try {
+      await fetch('/api/admin/nav-menu-items', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      fetchMenus();
+    } catch (e) { console.error(e); }
+  };
+
+  const moveOrder = async (id: string, direction: 'up' | 'down') => {
+    const idx = menus.findIndex(m => m.id === id);
+    if (idx < 0) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= menus.length) return;
+    const newMenus = [...menus];
+    const tmp = newMenus[idx].order;
+    newMenus[idx] = { ...newMenus[idx], order: newMenus[swapIdx].order };
+    newMenus[swapIdx] = { ...newMenus[swapIdx], order: tmp };
+    try {
+      await Promise.all([
+        fetch('/api/admin/nav-menus', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: newMenus[idx].id, order: newMenus[idx].order }) }),
+        fetch('/api/admin/nav-menus', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: newMenus[swapIdx].id, order: newMenus[swapIdx].order }) }),
+      ]);
+      fetchMenus();
+    } catch (e) { console.error(e); }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">{menus.length} menu utama</h3>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={fetchMenus} className="h-8 text-xs">
+            <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+          </Button>
+          <Button size="sm" onClick={() => setEditingParent({ label: '', en_label: '', href: '/', navKey: '', order: menus.length, active: true })} className="h-8 text-xs bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]">
+            <Plus className="w-3 h-3 mr-1" /> Tambah Menu
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+      ) : editingParent ? (
+        <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold">{editingParent.id ? 'Edit Menu' : 'Menu Baru'}</h4>
+            <Button size="sm" variant="ghost" onClick={() => setEditingParent(null)} className="h-7 w-7 p-0"><X className="w-4 h-4" /></Button>
+          </div>
+          <div><Label className="text-xs">Label (ID)</Label><Input value={editingParent.label || ''} onChange={e => setEditingParent({ ...editingParent, label: e.target.value })} className="text-sm mt-1" /></div>
+          <div><Label className="text-xs">Label (EN)</Label><Input value={editingParent.en_label || ''} onChange={e => setEditingParent({ ...editingParent, en_label: e.target.value })} className="text-sm mt-1" /></div>
+          <div><Label className="text-xs">URL / Href</Label><Input value={editingParent.href || ''} onChange={e => setEditingParent({ ...editingParent, href: e.target.value })} className="text-sm mt-1" placeholder="/" /></div>
+          <div><Label className="text-xs">Key (untuk dropdown, kosongkan jika tanpa sub-menu)</Label><Input value={editingParent.navKey || ''} onChange={e => setEditingParent({ ...editingParent, navKey: e.target.value })} className="text-sm mt-1" placeholder="contoh: layanan" /></div>
+          <div className="flex items-center gap-2">
+            <input type="checkbox" checked={editingParent.active !== false} onChange={e => setEditingParent({ ...editingParent, active: e.target.checked })} className="w-4 h-4 rounded" />
+            <Label className="text-xs">Aktif</Label>
+          </div>
+          <Button size="sm" onClick={handleSaveParent} disabled={saving} className="bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />} Simpan
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+          {menus.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Belum ada menu. Klik &quot;Tambah Menu&quot;.</p>
+          ) : menus.map((menu, idx) => (
+            <div key={menu.id} className="border rounded-lg overflow-hidden">
+              {/* Parent row */}
+              <div className="flex items-center gap-2 p-3 bg-white hover:shadow-sm transition-shadow">
+                <div className="flex flex-col gap-0.5">
+                  <button onClick={() => moveOrder(menu.id, 'up')} disabled={idx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs">▲</button>
+                  <button onClick={() => moveOrder(menu.id, 'down')} disabled={idx === menus.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs">▼</button>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{menu.label} <span className="text-muted-foreground font-normal">/ {menu.en_label || '—'}</span></p>
+                  <p className="text-xs text-muted-foreground">{menu.href} {menu.navKey ? `(key: ${menu.navKey})` : ''} {menu.children.length > 0 ? `· ${menu.children.length} sub` : ''}</p>
+                </div>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded ${menu.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{menu.active ? 'Aktif' : 'Nonaktif'}</span>
+                <button onClick={() => setExpandedParent(expandedParent === menu.id ? null : menu.id)} className="text-xs px-2 py-1 rounded hover:bg-muted text-muted-foreground">{menu.children.length > 0 ? (expandedParent === menu.id ? '▾' : `▸ ${menu.children.length}`) : '—'}</button>
+                <Button size="sm" variant="ghost" onClick={() => setEditingParent(menu)} className="h-8 w-8 p-0"><Pencil className="w-3.5 h-3.5" /></Button>
+                <Button size="sm" variant="ghost" onClick={() => handleDeleteParent(menu.id)} className="h-8 w-8 p-0 text-red-500 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+
+              {/* Children section */}
+              {expandedParent === menu.id && (
+                <div className="border-t bg-muted/20 p-2 space-y-1">
+                  <div className="flex items-center justify-between px-1 py-1">
+                    <span className="text-xs font-medium text-muted-foreground">Sub-menu ({menu.children.length})</span>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingChild({ parentId: menu.id, label: '', en_label: '', href: '/', icon: '', order: menu.children.length, active: true })} className="h-6 text-xs px-2">
+                      <Plus className="w-3 h-3 mr-1" /> Tambah
+                    </Button>
+                  </div>
+
+                  {editingChild && editingChild.parentId === menu.id ? (
+                    <div className="border rounded-lg p-3 bg-white space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold">{editingChild.id ? 'Edit Sub-menu' : 'Sub-menu Baru'}</span>
+                        <button onClick={() => setEditingChild(null)} className="text-muted-foreground hover:text-foreground"><X className="w-3.5 h-3.5" /></button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div><Label className="text-[10px]">Label (ID)</Label><Input value={editingChild.label || ''} onChange={e => setEditingChild({ ...editingChild, label: e.target.value })} className="text-xs mt-0.5 h-8" /></div>
+                        <div><Label className="text-[10px]">Label (EN)</Label><Input value={editingChild.en_label || ''} onChange={e => setEditingChild({ ...editingChild, en_label: e.target.value })} className="text-xs mt-0.5 h-8" /></div>
+                      </div>
+                      <div><Label className="text-[10px]">URL / Href</Label><Input value={editingChild.href || ''} onChange={e => setEditingChild({ ...editingChild, href: e.target.value })} className="text-xs mt-0.5 h-8" placeholder="/layanan#pendidikan" /></div>
+                      <div><Label className="text-[10px]">Icon Key</Label><Input value={editingChild.icon || ''} onChange={e => setEditingChild({ ...editingChild, icon: e.target.value })} className="text-xs mt-0.5 h-8" placeholder="pendidikan, kesehatan, dst." /></div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={handleSaveChild} disabled={saving} className="h-7 text-xs bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]">
+                          {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Save className="w-3 h-3 mr-1" />} Simpan
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingChild(null)} className="h-7 text-xs">Batal</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    menu.children.map((child) => (
+                      <div key={child.id} className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{child.label} <span className="text-muted-foreground font-normal">/ {child.en_label || '—'}</span></p>
+                          <p className="text-[10px] text-muted-foreground truncate">{child.href} {child.icon ? `· icon: ${child.icon}` : ''}</p>
+                        </div>
+                        <button onClick={() => setEditingChild(child)} className="text-muted-foreground hover:text-[var(--yamindo-teal)]"><Pencil className="w-3 h-3" /></button>
+                        <button onClick={() => handleDeleteChild(child.id)} className="text-muted-foreground hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPanel() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -921,6 +1135,8 @@ export default function AdminPanel() {
                   <TabsContent key={tab.key} value={tab.key}>
                     {tab.key === "site-config" ? (
                       <SiteConfigManager />
+                    ) : tab.key === "nav-menus" ? (
+                      <NavMenuManager />
                     ) : (
                       <EntityManager tabKey={tab.key} />
                     )}

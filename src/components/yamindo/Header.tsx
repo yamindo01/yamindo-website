@@ -59,6 +59,25 @@ const programIcons: Record<string, React.ComponentType<{ className?: string }>> 
   "kafalah-yatim": Baby,
 };
 
+interface DbNavMenu {
+  id: string;
+  label: string;
+  en_label: string;
+  href: string;
+  navKey: string;
+  order: number;
+  active: boolean;
+  children: {
+    id: string;
+    label: string;
+    en_label: string;
+    href: string;
+    icon: string;
+    order: number;
+    active: boolean;
+  }[];
+}
+
 export default function Header() {
   const { lang, t } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -66,9 +85,20 @@ export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [dbMenus, setDbMenus] = useState<DbNavMenu[]>([]);
 
-  // ====== Nav data with sub-menus ======
-  const navLinks = [
+  // Fetch menu from database
+  useEffect(() => {
+    fetch('/api/nav-menu')
+      .then(r => r.ok ? r.json() : [])
+      .then((data: DbNavMenu[]) => { if (data.length > 0) setDbMenus(data); })
+      .catch(() => {});
+  }, []);
+
+  // ====== Nav data: from DB or fallback to hardcoded ======
+  const useDbNav = dbMenus.length > 0;
+
+  const fallbackNavLinks = [
     { label: t("Beranda", "Home"), href: "/" },
     {
       label: t("Tentang", "About"),
@@ -122,6 +152,25 @@ export default function Header() {
     { label: t("Berita", "News"), href: "/berita" },
     { label: t("Kontak", "Contact"), href: "/kontak" },
   ];
+
+  // Convert DB menus to nav links format
+  const navLinks = useDbNav
+    ? dbMenus.map((m) => {
+        const children = m.children.length > 0
+          ? m.children.map((c) => ({
+              label: lang === "en" && c.en_label ? c.en_label : c.label,
+              href: c.href,
+              icon: c.icon,
+            }))
+          : undefined;
+        return {
+          label: lang === "en" && m.en_label ? m.en_label : m.label,
+          href: m.href,
+          key: m.navKey || undefined,
+          children,
+        };
+      })
+    : fallbackNavLinks;
 
   useEffect(() => {
     const handleScroll = () => {
