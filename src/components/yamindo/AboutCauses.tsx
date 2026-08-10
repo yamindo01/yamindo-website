@@ -160,6 +160,19 @@ export default function AboutCauses({
                 </div>
               </div>
             ))}
+            {/* Selengkapnya Link */}
+            <div className="pt-2 text-center">
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] text-sm font-medium px-6"
+              >
+                <a href="/program">
+                  {t("Selengkapnya", "View All Programs")}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
