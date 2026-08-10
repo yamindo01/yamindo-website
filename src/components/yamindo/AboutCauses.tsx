@@ -137,9 +137,14 @@ export default function AboutCauses({
                     <p className="text-sm text-muted-foreground mb-3">
                       {getField(cause, "description", lang)}
                     </p>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {t("Terkumpul", "Raised")} <span className="font-semibold text-[var(--yamindo-teal)]">{cause.raised}</span>
-                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                      <div>
+                        {t("Terkumpul", "Raised")} <span className="font-semibold text-[var(--yamindo-teal)]">{cause.raised}</span>
+                      </div>
+                      <div>
+                        {t("Target", "Goal")} <span className="font-semibold text-foreground">{cause.goal}</span>
+                      </div>
+                    </div>
                     <Progress value={cause.percent} className="h-2 mb-2" />
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-[var(--yamindo-teal)]">{cause.percent}%</span>
