@@ -1,14 +1,13 @@
 "use client";
 
 import {
-  Crown,
-  Briefcase,
-  Users,
   CheckCircle2,
   Instagram,
   Linkedin,
   Mail,
-  ChevronDown,
+  Users,
+  Crown,
+  Briefcase,
 } from "lucide-react";
 import { useLang, getField } from "@/lib/i18n";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +26,18 @@ interface TeamMemberItem {
   active: boolean;
 }
 
+interface OrgMemberItem {
+  id: string;
+  name: string;
+  en_name: string;
+  position: string;
+  en_position: string;
+  photo: string;
+  level: number;
+  order: number;
+  active: boolean;
+}
+
 interface GalleryPageItem {
   id: string;
   type: string;
@@ -40,90 +51,74 @@ interface GalleryPageItem {
   active: boolean;
 }
 
-// ====== Org Chart Nodes ======
-interface OrgNode {
-  id: string;
-  title: string;
-  enTitle: string;
-  subtitle: string;
-  enSubtitle: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
+// ====== Level config ======
+const LEVEL_CONFIG: Record<number, {
   bgColor: string;
-}
+  borderColor: string;
+  textColor: string;
+  iconBg: string;
+  iconColor: string;
+  label: string;
+  enLabel: string;
+  fallbackIcon: React.ComponentType<{ className?: string }>;
+}> = {
+  1: {
+    bgColor: "bg-amber-50",
+    borderColor: "border-amber-200",
+    textColor: "text-amber-700",
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+    label: "Ketua Yayasan",
+    enLabel: "Board Chair",
+    fallbackIcon: Crown,
+  },
+  2: {
+    bgColor: "bg-teal-50",
+    borderColor: "border-teal-200",
+    textColor: "text-teal-700",
+    iconBg: "bg-teal-100",
+    iconColor: "text-teal-600",
+    label: "Direktur Eksekutif",
+    enLabel: "Executive Director",
+    fallbackIcon: Briefcase,
+  },
+  3: {
+    bgColor: "bg-slate-50",
+    borderColor: "border-slate-200",
+    textColor: "text-slate-700",
+    iconBg: "bg-slate-100",
+    iconColor: "text-slate-500",
+    label: "Koordinator",
+    enLabel: "Coordinator",
+    fallbackIcon: Users,
+  },
+};
+
+// Color accents for level 3 coordinators (cycles through 4 colors)
+const COORD_COLORS = [
+  { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700", iconBg: "bg-emerald-100", icon: "text-emerald-600" },
+  { bg: "bg-rose-50", border: "border-rose-200", text: "text-rose-700", iconBg: "bg-rose-100", icon: "text-rose-600" },
+  { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", iconBg: "bg-violet-100", icon: "text-violet-600" },
+  { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", iconBg: "bg-blue-100", icon: "text-blue-600" },
+];
 
 export default function PageClient({
   teamMembers,
+  orgMembers,
   orgPhotos,
 }: {
   teamMembers: TeamMemberItem[];
+  orgMembers: OrgMemberItem[];
   orgPhotos: GalleryPageItem[];
 }) {
   const { lang, t } = useLang();
 
-  // Org chart structure
-  const orgChart: OrgNode[] = [
-    {
-      id: "ketua",
-      title: t("Ketua Yayasan", "Board Chair"),
-      enTitle: "Board Chair",
-      subtitle: t("Pimpinan Tertinggi", "Highest Leader"),
-      enSubtitle: "Highest Leader",
-      icon: Crown,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50 border-amber-200",
-    },
-    {
-      id: "direktur",
-      title: t("Direktur Eksekutif", "Executive Director"),
-      enTitle: "Executive Director",
-      subtitle: t("Pengelola Operasional", "Operations Manager"),
-      enSubtitle: "Operations Manager",
-      icon: Briefcase,
-      color: "text-[var(--yamindo-teal)]",
-      bgColor: "bg-[var(--yamindo-teal-light)] border-[var(--yamindo-teal)]/30",
-    },
-    {
-      id: "k1",
-      title: t("Koordinator Pendidikan", "Education Coordinator"),
-      enTitle: "Education Coordinator",
-      subtitle: t("Program Pendidikan", "Education Programs"),
-      enSubtitle: "Education Programs",
-      icon: Users,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50 border-emerald-200",
-    },
-    {
-      id: "k2",
-      title: t("Koordinator Kesehatan", "Healthcare Coordinator"),
-      enTitle: "Healthcare Coordinator",
-      subtitle: t("Program Kesehatan", "Healthcare Programs"),
-      enSubtitle: "Healthcare Programs",
-      icon: Users,
-      color: "text-rose-600",
-      bgColor: "bg-rose-50 border-rose-200",
-    },
-    {
-      id: "k3",
-      title: t("Koordinator Zakat & Wakaf", "Zakat & Waqf Coordinator"),
-      enTitle: "Zakat & Waqf Coordinator",
-      subtitle: t("Pengelolaan Zakat & Wakaf", "Zakat & Waqf Management"),
-      enSubtitle: "Zakat & Waqf Management",
-      icon: Users,
-      color: "text-violet-600",
-      bgColor: "bg-violet-50 border-violet-200",
-    },
-    {
-      id: "k4",
-      title: t("Koordinator IT & Media", "IT & Media Coordinator"),
-      enTitle: "IT & Media Coordinator",
-      subtitle: t("Teknologi & Komunikasi", "Technology & Communications"),
-      enSubtitle: "Technology & Communications",
-      icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 border-blue-200",
-    },
-  ];
+  // Group org members by level
+  const level1 = orgMembers.filter((m) => m.level === 1);
+  const level2 = orgMembers.filter((m) => m.level === 2);
+  const level3 = orgMembers.filter((m) => m.level === 3);
+
+  const hasOrgData = orgMembers.length > 0;
 
   return (
     <>
@@ -172,11 +167,11 @@ export default function PageClient({
         </div>
       </section>
 
-      {/* ====== ORG CHART ====== */}
+      {/* ====== ORG CHART WITH PHOTOS ====== */}
       <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           {/* Section Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
               <span className="w-8 h-px bg-[var(--yamindo-teal)]" />
               {t("Struktur Organisasi", "Organization Structure")}
@@ -187,28 +182,82 @@ export default function PageClient({
             </h2>
           </div>
 
-          {/* Chart */}
-          <div className="flex flex-col items-center gap-0">
-            {/* Level 1: Ketua */}
-            <OrgBox node={orgChart[0]} lang={lang} />
-            {/* Connector */}
-            <div className="w-px h-8 bg-[var(--yamindo-teal)]/30" />
-            <ChevronDown className="w-5 h-5 text-[var(--yamindo-teal)]/40 -mt-1" />
-            <div className="w-px h-6 bg-[var(--yamindo-teal)]/30" />
+          {hasOrgData ? (
+            /* ====== DYNAMIC ORG CHART FROM DATABASE ====== */
+            <div className="flex flex-col items-center gap-0">
+              {/* Level 1: Ketua Yayasan */}
+              {level1.map((member) => (
+                <OrgPhotoCard key={member.id} member={member} lang={lang} config={LEVEL_CONFIG[1]} />
+              ))}
 
-            {/* Level 2: Direktur */}
-            <OrgBox node={orgChart[1]} lang={lang} />
-            {/* Connector */}
-            <div className="w-px h-8 bg-[var(--yamindo-teal)]/30" />
-            <ChevronDown className="w-5 h-5 text-[var(--yamindo-teal)]/40 -mt-1" />
-            <div className="w-px h-6 bg-[var(--yamindo-teal)]/30" />
+              {/* Connector L1 -> L2 */}
+              {level1.length > 0 && level2.length > 0 && <Connector />}
 
-            {/* Level 3: 4 Coordinators */}
-            <div className="w-full">
-              {/* Horizontal connector line */}
-              <div className="hidden md:flex justify-center">
-                <div className="relative w-[75%] h-px bg-[var(--yamindo-teal)]/30">
-                  {/* Vertical drops */}
+              {/* Level 2: Direktur Eksekutif */}
+              {level2.map((member) => (
+                <OrgPhotoCard key={member.id} member={member} lang={lang} config={LEVEL_CONFIG[2]} />
+              ))}
+
+              {/* Connector L2 -> L3 */}
+              {level2.length > 0 && level3.length > 0 && (
+                <div className="w-full flex flex-col items-center">
+                  <div className="w-px h-8 bg-[var(--yamindo-teal)]/30" />
+                  <div className="relative w-[80%] max-w-3xl h-px bg-[var(--yamindo-teal)]/30">
+                    {level3.map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute top-0 w-px h-8 bg-[var(--yamindo-teal)]/30"
+                        style={{ left: level3.length > 1 ? `${(i / (level3.length - 1)) * 100}%` : "50%" }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Level 3: Coordinators */}
+              {level3.length > 0 && (
+                <div className="w-full max-w-5xl">
+                  <div
+                    className={`grid gap-6 ${
+                      level3.length <= 2
+                        ? "grid-cols-2 max-w-2xl mx-auto"
+                        : level3.length === 3
+                        ? "grid-cols-3 max-w-3xl mx-auto"
+                        : "grid-cols-2 md:grid-cols-4"
+                    }`}
+                  >
+                    {level3.map((member, i) => (
+                      <OrgPhotoCard
+                        key={member.id}
+                        member={member}
+                        lang={lang}
+                        config={{ ...LEVEL_CONFIG[3], ...COORD_COLORS[i % COORD_COLORS.length] }}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* ====== FALLBACK: Static icon-based org chart ====== */
+            <div className="flex flex-col items-center gap-0">
+              <StaticOrgBox
+                title={t("Ketua Yayasan", "Board Chair")}
+                subtitle={t("Pimpinan Tertinggi", "Highest Leader")}
+                icon={<Crown className="w-7 h-7 text-amber-600" />}
+                bgClass="bg-amber-50 border-amber-200"
+              />
+              <Connector />
+              <StaticOrgBox
+                title={t("Direktur Eksekutif", "Executive Director")}
+                subtitle={t("Pengelola Operasional", "Operations Manager")}
+                icon={<Briefcase className="w-7 h-7 text-teal-600" />}
+                bgClass="bg-teal-50 border-teal-200"
+              />
+              <div className="w-full flex flex-col items-center">
+                <div className="w-px h-8 bg-[var(--yamindo-teal)]/30" />
+                <div className="relative w-[75%] max-w-2xl h-px bg-[var(--yamindo-teal)]/30">
                   {[0, 1, 2, 3].map((i) => (
                     <div
                       key={i}
@@ -218,13 +267,25 @@ export default function PageClient({
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {orgChart.slice(2).map((node) => (
-                  <OrgBox key={node.id} node={node} lang={lang} compact />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl">
+                {[
+                  { title: t("Koordinator Pendidikan", "Education Coordinator"), sub: t("Program Pendidikan", "Education Programs"), cls: "bg-emerald-50 border-emerald-200" },
+                  { title: t("Koordinator Kesehatan", "Healthcare Coordinator"), sub: t("Program Kesehatan", "Healthcare Programs"), cls: "bg-rose-50 border-rose-200" },
+                  { title: t("Koordinator Zakat & Wakaf", "Zakat & Waqf Coordinator"), sub: t("Pengelolaan Zakat & Wakaf", "Zakat & Waqf Management"), cls: "bg-violet-50 border-violet-200" },
+                  { title: t("Koordinator IT & Media", "IT & Media Coordinator"), sub: t("Teknologi & Komunikasi", "Technology & Communications"), cls: "bg-blue-50 border-blue-200" },
+                ].map((node) => (
+                  <StaticOrgBox
+                    key={node.title}
+                    title={node.title}
+                    subtitle={node.sub}
+                    icon={<Users className="w-5 h-5 text-muted-foreground" />}
+                    bgClass={node.cls}
+                    compact
+                  />
                 ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -404,38 +465,109 @@ export default function PageClient({
   );
 }
 
-// ====== Org Chart Box Component ======
-function OrgBox({
-  node,
+// ====== Connector line between org levels ======
+function Connector() {
+  return (
+    <>
+      <div className="w-px h-6 bg-[var(--yamindo-teal)]/30" />
+      <div className="w-3 h-3 rounded-full border-2 border-[var(--yamindo-teal)]/30 bg-white" />
+      <div className="w-px h-6 bg-[var(--yamindo-teal)]/30" />
+    </>
+  );
+}
+
+// ====== Photo-based Org Card (from database) ======
+function OrgPhotoCard({
+  member,
   lang,
+  config,
   compact = false,
 }: {
-  node: OrgNode;
+  member: OrgMemberItem;
   lang: "id" | "en";
+  config: {
+    bgColor: string;
+    borderColor: string;
+    textColor: string;
+    iconBg: string;
+    iconColor: string;
+    fallbackIcon: React.ComponentType<{ className?: string }>;
+  };
   compact?: boolean;
 }) {
-  const IconComponent = node.icon;
-  const title = lang === "en" ? node.enTitle : node.title;
-  const subtitle = lang === "en" ? node.enSubtitle : node.subtitle;
+  const name = lang === "en" && member.en_name ? member.en_name : member.name;
+  const position = lang === "en" && member.en_position ? member.en_position : member.position;
+  const FallbackIcon = config.fallbackIcon;
+  const photoSize = compact ? "w-20 h-20 md:w-24 md:h-24" : "w-28 h-28 md:w-32 md:h-32";
 
   return (
     <div className={`flex flex-col items-center ${compact ? "" : "w-full max-w-xs"}`}>
       <div
-        className={`${node.bgColor} border-2 rounded-2xl px-6 py-5 ${compact ? "px-3 py-4" : "px-8 py-6"} text-center shadow-sm hover:shadow-md transition-shadow w-full`}
+        className={`${config.bgColor} ${config.borderColor} border-2 rounded-2xl px-6 py-6 text-center shadow-sm hover:shadow-lg transition-all duration-300 w-full`}
+      >
+        {/* Photo */}
+        <div className="flex justify-center mb-4">
+          <div className={`relative ${photoSize} rounded-full overflow-hidden border-4 border-white shadow-md`}>
+            {member.photo ? (
+              <img
+                src={member.photo}
+                alt={name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className={`w-full h-full ${config.iconBg} flex items-center justify-center`}>
+                <FallbackIcon className={`w-10 h-10 ${config.iconColor}`} />
+              </div>
+            )}
+          </div>
+        </div>
+        {/* Name */}
+        <h3
+          className={`font-bold ${config.textColor} ${compact ? "text-sm" : "text-lg"} leading-tight`}
+        >
+          {name}
+        </h3>
+        {/* Position */}
+        <p
+          className={`text-muted-foreground mt-1.5 ${compact ? "text-xs" : "text-sm"} leading-snug`}
+        >
+          {position}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ====== Static Org Box (fallback when no DB data) ======
+function StaticOrgBox({
+  title,
+  subtitle,
+  icon,
+  bgClass,
+  compact = false,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  bgClass: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col items-center ${compact ? "" : "w-full max-w-xs"}`}>
+      <div
+        className={`${bgClass} border-2 rounded-2xl ${compact ? "px-3 py-4" : "px-8 py-6"} text-center shadow-sm hover:shadow-md transition-shadow w-full`}
       >
         <div
-          className={`w-12 h-12 ${compact ? "w-10 h-10" : "w-14 h-14"} rounded-xl bg-white shadow-sm flex items-center justify-center mx-auto mb-3`}
+          className={`${compact ? "w-10 h-10" : "w-14 h-14"} rounded-xl bg-white shadow-sm flex items-center justify-center mx-auto mb-3`}
         >
-          <IconComponent className={`w-6 h-6 ${compact ? "w-5 h-5" : "w-7 h-7"} ${node.color}`} />
+          {icon}
         </div>
         <h3
-          className={`font-bold ${node.color} ${compact ? "text-sm" : "text-lg"} leading-tight`}
+          className={`font-bold text-foreground ${compact ? "text-sm" : "text-lg"} leading-tight`}
         >
           {title}
         </h3>
-        <p
-          className={`text-muted-foreground mt-1 ${compact ? "text-xs" : "text-sm"}`}
-        >
+        <p className={`text-muted-foreground mt-1 ${compact ? "text-xs" : "text-sm"}`}>
           {subtitle}
         </p>
       </div>

@@ -18,11 +18,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate file size (max 2MB)
-    const maxSize = 2 * 1024 * 1024;
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "Ukuran file terlalu besar. Maksimal 2MB." },
+        { error: "Ukuran file terlalu besar. Maksimal 5MB." },
         { status: 400 }
       );
     }

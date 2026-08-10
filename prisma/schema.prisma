@@ -301,3 +301,17 @@ model ContactMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model OrgMember {
+  id        String   @id @default(cuid())
+  name      String
+  en_name   String   @default("")
+  position  String
+  en_position String @default("")
+  photo     String   @default("")
+  level     Int      @default(3)
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

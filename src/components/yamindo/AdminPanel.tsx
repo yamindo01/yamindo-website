@@ -51,6 +51,7 @@ const ADMIN_TABS = [
   { key: "causes", label: "Program Donasi" },
   { key: "counters", label: "Counter" },
   { key: "team-members", label: "Tim" },
+  { key: "org-members", label: "Struktur Org" },
   { key: "gallery-images", label: "Galeri" },
   { key: "testimonials", label: "Testimoni" },
   { key: "blog-posts", label: "Berita" },
@@ -267,6 +268,16 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "subject", label: "Subjek", type: "text" },
     { key: "message", label: "Pesan", type: "textarea" },
     { key: "isRead", label: "Dibaca", type: "checkbox" },
+  ],
+  "org-members": [
+    { key: "name", label: "Nama (ID)", type: "text" },
+    { key: "en_name", label: "Name (EN)", type: "text" },
+    { key: "position", label: "Jabatan (ID)", type: "text" },
+    { key: "en_position", label: "Position (EN)", type: "text" },
+    { key: "photo", label: "Foto", type: "image" },
+    { key: "level", label: "Level (1=Ketua, 2=Direktur, 3=Staff)", type: "number" },
+    { key: "order", label: "Urutan", type: "number" },
+    { key: "active", label: "Aktif", type: "checkbox" },
   ],
 };
 
@@ -553,7 +564,13 @@ function EntityManager({
     if (tabKey === "hero-slides") return "title";
     if (tabKey === "gallery-images") return "alt";
     if (tabKey === "donation-presets") return "label";
-    return "title" || "name" || "label" || "date";
+    if (tabKey === "org-members") return "name";
+    if (tabKey === "team-members") return "name";
+    if (tabKey === "counters") return "label";
+    if (tabKey === "partners") return "name";
+    if (tabKey === "footer-events") return "title";
+    if (tabKey === "contact-messages") return "subject";
+    return "title";
   };
 
   const titleField = getTitleField();
@@ -630,9 +647,9 @@ function EntityManager({
                 key={item.id}
                 className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow"
               >
-                {item.image || item.src ? (
+                {(item.image || item.src || item.photo) ? (
                   <img
-                    src={item.image || item.src}
+                    src={item.image || item.src || item.photo}
                     alt=""
                     className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                   />
@@ -646,7 +663,7 @@ function EntityManager({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{item[titleField] || "(no title)"}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {item.subtitle || item.role || item.category || item.tag || item.label || ""}
+                    {item.position || item.subtitle || item.role || item.category || item.tag || item.label || ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">

@@ -21,6 +21,7 @@ const ALLOWED_MODELS = [
   "galleryPageItem",
   "newsArticle",
   "contactMessage",
+  "orgMember",
 ] as const;
 
 type ModelName = (typeof ALLOWED_MODELS)[number];
@@ -45,6 +46,7 @@ function getModel(model: string) {
     galleryPageItem: db.galleryPageItem,
     newsArticle: db.newsArticle,
     contactMessage: db.contactMessage,
+    orgMember: db.orgMember,
   };
   return models[model];
 }
