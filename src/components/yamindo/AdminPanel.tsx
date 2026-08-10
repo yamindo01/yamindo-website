@@ -92,7 +92,7 @@ const GRADIENT_OPTIONS = [
 interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox" | "image";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "image" | "readonly";
   options?: { label: string; value: string }[];
 }
 
@@ -130,7 +130,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "image", label: "URL Gambar", type: "image" },
     { key: "raised", label: "Terkumpul", type: "text" },
     { key: "goal", label: "Target", type: "text" },
-    { key: "percent", label: "Persen", type: "number" },
+    { key: "percent", label: "Persen (otomatis)", type: "readonly" },
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
   counters: [
@@ -231,7 +231,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_category", label: "Category (EN)", type: "text" },
     { key: "raised", label: "Terkumpul", type: "text" },
     { key: "goal", label: "Target", type: "text" },
-    { key: "percent", label: "Persen", type: "number" },
+    { key: "percent", label: "Persen (otomatis)", type: "readonly" },
     { key: "status", label: "Status", type: "select", options: [{ label: "Aktif", value: "active" }, { label: "Selesai", value: "completed" }, { label: "Akan Datang", value: "upcoming" }] },
     { key: "order", label: "Urutan", type: "number" },
     { key: "active", label: "Aktif", type: "checkbox" },
@@ -429,6 +429,46 @@ function DynamicForm({
         if (field.type === "image") {
           return <ImageUploadField key={field.key} field={field} value={val} onChange={onChange} />;
         }
+        if (field.type === "readonly") {
+          const pct = Number(val) || 0;
+          return (
+            <div key={field.key}>
+              <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                {field.label}
+              </Label>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-7 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
+                    style={{
+                      width: `${Math.min(pct, 100)}%`,
+                      background: pct >= 100
+                        ? 'linear-gradient(90deg, #10b981, #059669)'
+                        : pct >= 50
+                        ? 'linear-gradient(90deg, #0d9488, var(--yamindo-teal))'
+                        : 'linear-gradient(90deg, #f59e0b, #f97316)',
+                    }}
+                  >
+                    {pct >= 15 && (
+                      <span className="text-[10px] font-bold text-white drop-shadow">
+                        {pct}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <span className={`text-sm font-bold min-w-[3rem] text-right ${
+                  pct >= 100 ? 'text-emerald-600' : 'text-[var(--yamindo-teal)]'
+                }`}>
+                  {pct}%
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Dihitung otomatis: Terkumpul ÷ Target
+                {pct >= 100 && ' ✓ Target tercapai!'}
+              </p>
+            </div>
+          );
+        }
         if (field.type === "checkbox") {
           return (
             <div key={field.key} className="flex items-center gap-2">
@@ -535,9 +575,23 @@ function EntityManager({
     }
   };
 
+  // Helper: parse Rp string like "Rp 4.000.000" to number
+  const parseRp = (s: string): number => {
+    if (!s) return 0;
+    const cleaned = s.replace(/[^0-9]/g, '');
+    return parseInt(cleaned, 10) || 0;
+  };
+
   const handleFieldChange = (key: string, value: any) => {
     if (!editing) return;
-    setEditing({ ...editing, [key]: value });
+    const updated = { ...editing, [key]: value };
+    // Auto-calculate percent for causes & program-details
+    if ((tabKey === 'causes' || tabKey === 'program-details') && (key === 'raised' || key === 'goal')) {
+      const raisedNum = parseRp(updated.raised);
+      const goalNum = parseRp(updated.goal);
+      updated.percent = goalNum > 0 ? Math.min(Math.round((raisedNum / goalNum) * 100), 100) : 0;
+    }
+    setEditing(updated);
   };
 
   const startCreate = () => {
