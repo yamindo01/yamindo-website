@@ -42,6 +42,11 @@ const serviceIcons: Record<string, React.ComponentType<{ className?: string }>> 
   wakaf: Landmark,
 };
 
+const tentangIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  "tentang-kami": Building2,
+  "tim-kami": Users,
+};
+
 const programIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   "makan-santri": UtensilsCrossed,
   "buka-puasa": Sunset,
@@ -65,7 +70,15 @@ export default function Header() {
   // ====== Nav data with sub-menus ======
   const navLinks = [
     { label: t("Beranda", "Home"), href: "/" },
-    { label: t("Tentang", "About"), href: "/tentang" },
+    {
+      label: t("Tentang", "About"),
+      href: "/tentang",
+      key: "tentang",
+      children: [
+        { label: t("Tentang Kami", "About Us"), href: "/tentang", icon: "tentang-kami" },
+        { label: t("Tim Kami", "Our Team"), href: "/tim", icon: "tim-kami" },
+      ],
+    },
     {
       label: t("Layanan", "Services"),
       href: "/layanan",
@@ -97,7 +110,6 @@ export default function Header() {
         { label: t("Program Kafalah Yatim", "Orphan Sponsorship Program"), href: "/program#kafalah-yatim", icon: "kafalah-yatim" },
       ],
     },
-    { label: t("Tim", "Team"), href: "/tim" },
     {
       label: t("Galeri", "Gallery"),
       href: "/galeri",
@@ -165,6 +177,7 @@ export default function Header() {
 
   // ====== Get icon by group ======
   const getSubIcon = (parentKey: string, iconKey: string) => {
+    if (parentKey === "tentang") return tentangIcons[iconKey];
     if (parentKey === "layanan") return serviceIcons[iconKey];
     if (parentKey === "program") return programIcons[iconKey];
     if (parentKey === "galeri") return getGalleryIcon(iconKey);
