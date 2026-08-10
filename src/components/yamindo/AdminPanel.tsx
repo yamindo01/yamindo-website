@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Sheet,
   SheetContent,
@@ -41,6 +41,7 @@ import {
   LogIn,
   LogOut,
   ShieldCheck,
+  Upload,
 } from "lucide-react";
 
 const ADMIN_TABS = [
@@ -89,7 +90,7 @@ const GRADIENT_OPTIONS = [
 interface FieldDef {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "image";
   options?: { label: string; value: string }[];
 }
 
@@ -101,7 +102,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_subtitle", label: "Subtitle (EN)", type: "text" },
     { key: "description", label: "Deskripsi (ID)", type: "textarea" },
     { key: "en_description", label: "Description (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "bullets", label: "Bullet Points (ID, JSON array)", type: "text" },
     { key: "en_bullets", label: "Bullet Points (EN, JSON array)", type: "text" },
     { key: "bgGradient", label: "Gradient", type: "select", options: GRADIENT_OPTIONS },
@@ -113,7 +114,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_title", label: "Title (EN)", type: "text" },
     { key: "description", label: "Deskripsi (ID)", type: "textarea" },
     { key: "en_description", label: "Description (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "icon", label: "Ikon", type: "select", options: ICON_OPTIONS.map((i) => ({ label: i, value: i })) },
     { key: "color", label: "Warna Gradient", type: "select", options: COLOR_OPTIONS },
     { key: "order", label: "Urutan", type: "number" },
@@ -124,7 +125,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_title", label: "Title (EN)", type: "text" },
     { key: "description", label: "Deskripsi (ID)", type: "textarea" },
     { key: "en_description", label: "Description (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "raised", label: "Terkumpul", type: "text" },
     { key: "goal", label: "Target", type: "text" },
     { key: "percent", label: "Persen", type: "number" },
@@ -144,11 +145,11 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_role", label: "Role (EN)", type: "text" },
     { key: "bio", label: "Bio (ID)", type: "textarea" },
     { key: "en_bio", label: "Bio (EN)", type: "textarea" },
-    { key: "image", label: "URL Foto", type: "text" },
+    { key: "image", label: "URL Foto", type: "image" },
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
   "gallery-images": [
-    { key: "src", label: "URL Gambar", type: "text" },
+    { key: "src", label: "URL Gambar", type: "image" },
     { key: "alt", label: "Alt Text (ID)", type: "text" },
     { key: "en_alt", label: "Alt Text (EN)", type: "text" },
     { key: "order", label: "Urutan", type: "number" },
@@ -161,7 +162,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_role", label: "Role (EN)", type: "text" },
     { key: "text", label: "Testimoni (ID)", type: "textarea" },
     { key: "en_text", label: "Testimonial (EN)", type: "textarea" },
-    { key: "image", label: "URL Foto", type: "text" },
+    { key: "image", label: "URL Foto", type: "image" },
     { key: "rating", label: "Rating (1-5)", type: "number" },
     { key: "tag", label: "Tag (ID)", type: "text" },
     { key: "en_tag", label: "Tag (EN)", type: "text" },
@@ -173,7 +174,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "category", label: "Kategori (ID)", type: "text" },
     { key: "en_category", label: "Category (EN)", type: "text" },
     { key: "date", label: "Tanggal", type: "text" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "excerpt", label: "Ringkasan (ID)", type: "textarea" },
     { key: "en_excerpt", label: "Excerpt (EN)", type: "textarea" },
     { key: "active", label: "Aktif", type: "checkbox" },
@@ -198,7 +199,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_title", label: "Title (EN)", type: "text" },
     { key: "content", label: "Konten (ID)", type: "textarea" },
     { key: "en_content", label: "Content (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "items", label: "Items (ID, JSON)", type: "text" },
     { key: "en_items", label: "Items (EN, JSON)", type: "text" },
     { key: "order", label: "Urutan", type: "number" },
@@ -211,7 +212,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_short_desc", label: "Short Desc (EN)", type: "textarea" },
     { key: "content", label: "Konten Lengkap (ID)", type: "textarea" },
     { key: "en_content", label: "Full Content (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "icon", label: "Ikon", type: "select", options: ICON_OPTIONS.map((i) => ({ label: i, value: i })) },
     { key: "features", label: "Fitur (ID, JSON)", type: "text" },
     { key: "en_features", label: "Features (EN, JSON)", type: "text" },
@@ -223,7 +224,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_title", label: "Title (EN)", type: "text" },
     { key: "description", label: "Deskripsi (ID)", type: "textarea" },
     { key: "en_description", label: "Description (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "category", label: "Kategori (ID)", type: "text" },
     { key: "en_category", label: "Category (EN)", type: "text" },
     { key: "raised", label: "Terkumpul", type: "text" },
@@ -235,7 +236,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
   ],
   "gallery-page-items": [
     { key: "type", label: "Tipe", type: "select", options: [{ label: "Foto", value: "photo" }, { label: "Video", value: "video" }] },
-    { key: "src", label: "URL Sumber", type: "text" },
+    { key: "src", label: "URL Sumber", type: "image" },
     { key: "alt", label: "Alt Text (ID)", type: "text" },
     { key: "en_alt", label: "Alt Text (EN)", type: "text" },
     { key: "category", label: "Kategori (ID)", type: "text" },
@@ -253,7 +254,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_content", label: "Content (EN)", type: "textarea" },
     { key: "excerpt", label: "Ringkasan (ID)", type: "textarea" },
     { key: "en_excerpt", label: "Excerpt (EN)", type: "textarea" },
-    { key: "image", label: "URL Gambar", type: "text" },
+    { key: "image", label: "URL Gambar", type: "image" },
     { key: "author", label: "Penulis", type: "text" },
     { key: "date", label: "Tanggal", type: "text" },
     { key: "featured", label: "Artikel Unggulan", type: "checkbox" },
@@ -268,6 +269,98 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "isRead", label: "Dibaca", type: "checkbox" },
   ],
 };
+
+function ImageUploadField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldDef;
+  value: any;
+  onChange: (key: string, value: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) {
+        onChange(field.key, data.url);
+      } else {
+        alert(data.error || "Upload gagal");
+      }
+    } catch {
+      alert("Upload gagal");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+        {field.label}
+      </Label>
+      {value && (
+        <div className="mb-2 relative inline-block">
+          <img
+            src={value}
+            alt="Preview"
+            className="w-20 h-20 object-cover rounded-lg border"
+          />
+          <button
+            type="button"
+            onClick={() => onChange(field.key, "")}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+          >
+            X
+          </button>
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+          className="text-xs"
+        >
+          {uploading ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+          ) : (
+            <Upload className="w-3.5 h-3.5 mr-1.5" />
+          )}
+          {uploading ? "Mengupload..." : "Pilih Foto"}
+        </Button>
+      </div>
+      <div className="mt-1.5">
+        <input
+          type="text"
+          placeholder="Atau paste URL gambar..."
+          value={typeof value === "string" && !value.startsWith("data:") ? value : ""}
+          onChange={(e) => onChange(field.key, e.target.value)}
+          className="w-full text-xs px-2 py-1.5 border rounded-md bg-transparent"
+        />
+      </div>
+    </div>
+  );
+}
 
 function DynamicForm({
   fields,
@@ -320,6 +413,9 @@ function DynamicForm({
               </Select>
             </div>
           );
+        }
+        if (field.type === "image") {
+          return <ImageUploadField key={field.key} field={field} value={val} onChange={onChange} />;
         }
         if (field.type === "checkbox") {
           return (
