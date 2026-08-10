@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Phone, Mail, MapPin, ArrowUp, Facebook, Twitter, Instagram, Linkedin, Youtube, Calendar } from "lucide-react";
+import { Heart, Phone, Mail, MapPin, ArrowUp, Facebook, Twitter, Instagram, Linkedin, Youtube, Calendar, ShieldCheck } from "lucide-react";
 import { useLang, getField } from "@/lib/i18n";
 
 interface EventItem {
@@ -166,6 +166,14 @@ export default function Footer({
           <p>
             {t("Dibuat dengan", "Made with")} <Heart className="w-3 h-3 inline text-[var(--yamindo-coral)] fill-[var(--yamindo-coral)]" /> {t("untuk Indonesia", "for Indonesia")}
           </p>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("open-yamindo-admin"))}
+            className="text-white/30 hover:text-[var(--yamindo-teal)] transition-colors flex items-center gap-1.5 text-xs"
+            title="Admin Panel"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Admin
+          </button>
         </div>
       </div>
 

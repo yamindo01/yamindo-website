@@ -8,6 +8,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +38,9 @@ import {
   RefreshCw,
   Image,
   CheckCircle,
+  LogIn,
+  LogOut,
+  ShieldCheck,
 } from "lucide-react";
 
 const ADMIN_TABS = [
@@ -687,55 +697,183 @@ function SiteConfigManager() {
 }
 
 export default function AdminPanel() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("site-config");
 
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <button
-          className="fixed bottom-6 left-6 w-12 h-12 bg-[var(--yamindo-teal-dark)] hover:bg-[var(--yamindo-teal)] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-50"
-          aria-label="Buka Admin Panel"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
-      </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
-        <SheetHeader className="p-4 pb-2 border-b bg-[var(--yamindo-teal-dark)] text-white sticky top-0 z-10">
-          <SheetTitle className="flex items-center gap-2 text-white">
-            <Settings className="w-5 h-5" />
-            Admin Panel — Yamindo CMS
-          </SheetTitle>
-          <p className="text-xs text-white/60">
-            Kelola semua konten website dari sini. Perubahan langsung terlihat setelah refresh halaman.
-          </p>
-        </SheetHeader>
-        <div className="p-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full h-auto flex-wrap gap-1 bg-muted/50 p-1 mb-4">
-              {ADMIN_TABS.map((tab) => (
-                <TabsTrigger
-                  key={tab.key}
-                  value={tab.key}
-                  className="text-xs px-2.5 py-1.5 data-[state=active]:bg-[var(--yamindo-teal)] data-[state=active]:text-white"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+  // Check localStorage on mount
+  useEffect(() => {
+    const auth = localStorage.getItem("yamindo_admin_auth");
+    if (auth === "true") setIsLoggedIn(true);
+  }, []);
 
-            {ADMIN_TABS.map((tab) => (
-              <TabsContent key={tab.key} value={tab.key}>
-                {tab.key === "site-config" ? (
-                  <SiteConfigManager />
+  // Listen for open request from footer button
+  useEffect(() => {
+    const handleOpenAdmin = () => {
+      if (isLoggedIn) {
+        setOpen(true);
+      } else {
+        setShowLogin(true);
+      }
+    };
+    window.addEventListener("open-yamindo-admin", handleOpenAdmin);
+    return () => window.removeEventListener("open-yamindo-admin", handleOpenAdmin);
+  }, [isLoggedIn]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: loginPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("yamindo_admin_auth", "true");
+        setIsLoggedIn(true);
+        setShowLogin(false);
+        setLoginPassword("");
+        setOpen(true);
+      } else {
+        setLoginError(data.error || "Password salah");
+      }
+    } catch {
+      setLoginError("Gagal menghubungi server");
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("yamindo_admin_auth");
+    setIsLoggedIn(false);
+    setOpen(false);
+  };
+
+  return (
+    <>
+      {/* Floating Admin Button - only shown when logged in */}
+      {isLoggedIn && (
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button
+              className="fixed bottom-6 left-6 w-12 h-12 bg-[var(--yamindo-teal-dark)] hover:bg-[var(--yamindo-teal)] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-50"
+              aria-label="Buka Admin Panel"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
+            <SheetHeader className="p-4 pb-2 border-b bg-[var(--yamindo-teal-dark)] text-white sticky top-0 z-10">
+              <SheetTitle className="flex items-center justify-between text-white">
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5" />
+                  Admin Panel — Yamindo CMS
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-white/60 hover:text-white flex items-center gap-1 transition-colors"
+                  title="Keluar"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Keluar
+                </button>
+              </SheetTitle>
+              <p className="text-xs text-white/60">
+                Kelola semua konten website dari sini. Perubahan langsung terlihat setelah refresh halaman.
+              </p>
+            </SheetHeader>
+            <div className="p-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="w-full h-auto flex-wrap gap-1 bg-muted/50 p-1 mb-4">
+                  {ADMIN_TABS.map((tab) => (
+                    <TabsTrigger
+                      key={tab.key}
+                      value={tab.key}
+                      className="text-xs px-2.5 py-1.5 data-[state=active]:bg-[var(--yamindo-teal)] data-[state=active]:text-white"
+                    >
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                {ADMIN_TABS.map((tab) => (
+                  <TabsContent key={tab.key} value={tab.key}>
+                    {tab.key === "site-config" ? (
+                      <SiteConfigManager />
+                    ) : (
+                      <EntityManager tabKey={tab.key} />
+                    )}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
+
+      {/* Login Dialog */}
+      <Dialog open={showLogin} onOpenChange={setShowLogin}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-[var(--yamindo-teal)]" />
+              Masuk Admin Panel
+            </DialogTitle>
+            <DialogDescription>
+              Masukkan password admin untuk mengelola konten website Yamindo.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <Label htmlFor="admin-password">Password Admin</Label>
+              <Input
+                id="admin-password"
+                type="password"
+                placeholder="Masukkan password..."
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                className="mt-1.5"
+                autoFocus
+              />
+              {loginError && (
+                <p className="text-sm text-red-500 mt-1.5">{loginError}</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { setShowLogin(false); setLoginPassword(""); setLoginError(""); }}
+                className="flex-1"
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                disabled={loginLoading || !loginPassword}
+                className="flex-1 bg-[var(--yamindo-teal-dark)] hover:bg-[var(--yamindo-teal)]"
+              >
+                {loginLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <EntityManager tabKey={tab.key} />
+                  <>
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Masuk
+                  </>
                 )}
-              </TabsContent>
-            ))}
-          </Tabs>
-        </div>
-      </SheetContent>
-    </Sheet>
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
