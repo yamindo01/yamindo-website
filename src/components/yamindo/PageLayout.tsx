@@ -1,5 +1,3 @@
-"use client";
-
 import TopBar from "@/components/yamindo/TopBar";
 import Header from "@/components/yamindo/Header";
 import Footer from "@/components/yamindo/Footer";
