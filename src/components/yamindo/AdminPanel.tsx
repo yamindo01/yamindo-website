@@ -309,19 +309,34 @@ function ImageUploadField({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Format file tidak didukung. Gunakan JPG, PNG, GIF, atau WebP.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
+    // Validate file size (4MB max for Vercel/DB safety)
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Ukuran file terlalu besar. Maksimal 4MB. Coba kompress dulu fotonya.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) {
-        onChange(field.key, data.url);
-      } else {
-        alert(data.error || "Upload gagal");
-      }
-    } catch {
-      alert("Upload gagal");
+      // Convert to base64 entirely client-side (no server upload needed)
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("Gagal membaca file"));
+        reader.readAsDataURL(file);
+      });
+      onChange(field.key, dataUrl);
+    } catch (err) {
+      alert("Upload gagal: " + (err instanceof Error ? err.message : "Unknown error"));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";

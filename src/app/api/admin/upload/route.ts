@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (Vercel body limit safe)
 const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
@@ -9,9 +9,28 @@ const ALLOWED_TYPES = [
   "image/bmp",
 ];
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// Prevent Next.js from parsing the body — we handle FormData manually
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (parseErr) {
+      console.error("FormData parse error:", parseErr);
+      return NextResponse.json(
+        { error: "Gagal membaca file. Coba gunakan file lebih kecil (maks 4MB)." },
+        { status: 400 }
+      );
+    }
+
     const file = formData.get("file") as File | null;
 
     if (!file) {
@@ -27,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "Ukuran file terlalu besar. Maksimal 5MB." },
+        { error: "Ukuran file terlalu besar. Maksimal 4MB." },
         { status: 400 }
       );
     }
@@ -38,7 +57,8 @@ export async function POST(request: NextRequest) {
     const dataUrl = `data:${file.type};base64,${base64}`;
 
     return NextResponse.json({ url: dataUrl });
-  } catch {
-    return NextResponse.json({ error: "Upload gagal" }, { status: 500 });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return NextResponse.json({ error: "Upload gagal: " + (err instanceof Error ? err.message : "Unknown error") }, { status: 500 });
   }
 }
