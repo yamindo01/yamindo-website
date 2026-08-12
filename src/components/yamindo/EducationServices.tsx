@@ -53,8 +53,8 @@ export default function EducationServices({
           </p>
         </div>
 
-        {/* Cards Grid - 3 cards centered */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        {/* Cards Grid - 4 cards in one row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
           {data.map((item) => {
             const IconComponent = iconMap[item.icon] || BookOpen;
             return (
