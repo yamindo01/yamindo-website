@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import DonationModal from "@/components/yamindo/DonationModal";
 
 // ====== Types ======
 interface ProgramDetailItem {
@@ -64,6 +65,14 @@ export default function PageClient({
   const { lang, t } = useLang();
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] =
+    useState<ProgramDetailItem | null>(null);
+
+  const openDonationModal = (program: ProgramDetailItem) => {
+    setSelectedProgram(program);
+    setModalOpen(true);
+  };
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -344,6 +353,7 @@ export default function PageClient({
                       {/* Donate button */}
                       <Button
                         className="w-full bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)] text-white rounded-xl py-5 text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                        onClick={() => openDonationModal(program)}
                       >
                         <Heart className="w-4 h-4 mr-2" />
                         {t("Donasi Sekarang", "Donate Now")}
@@ -440,12 +450,26 @@ export default function PageClient({
           <Button
             size="lg"
             className="bg-white text-[var(--yamindo-teal-dark)] hover:bg-white/90 rounded-xl px-10 font-semibold shadow-lg text-base"
+            onClick={() => {
+              if (data.length > 0) openDonationModal(data[0]);
+            }}
           >
             <Heart className="w-5 h-5 mr-2" />
             {t("Mulai Donasi", "Start Donating")}
           </Button>
         </div>
       </section>
+
+      {/* Donation Modal */}
+      {selectedProgram && (
+        <DonationModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          programTitle={selectedProgram.title}
+          programTitleEn={selectedProgram.en_title}
+          programGoal={selectedProgram.goal}
+        />
+      )}
     </>
   );
 }

@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLang, getField } from "@/lib/i18n";
+import DonationModal from "@/components/yamindo/DonationModal";
 
 interface CauseItem {
   id: string;
@@ -24,6 +26,13 @@ export default function AboutCauses({
   causes: CauseItem[];
 }) {
   const { lang, t } = useLang();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCause, setSelectedCause] = useState<CauseItem | null>(null);
+
+  const openDonationModal = (cause: CauseItem) => {
+    setSelectedCause(cause);
+    setModalOpen(true);
+  };
 
   return (
     <section id="program" className="py-16 md:py-24 bg-gradient-soft">
@@ -88,6 +97,7 @@ export default function AboutCauses({
                   <Button
                     size="sm"
                     className="bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full text-xs px-4"
+                    onClick={() => openDonationModal(cause)}
                   >
                     <Heart className="w-3 h-3 mr-1 fill-white" />
                     {t("Donasi", "Donate")}
@@ -111,6 +121,17 @@ export default function AboutCauses({
             </a>
           </Button>
         </div>
+
+        {/* Donation Modal */}
+        {selectedCause && (
+          <DonationModal
+            open={modalOpen}
+            onOpenChange={setModalOpen}
+            programTitle={selectedCause.title}
+            programTitleEn={selectedCause.en_title}
+            programGoal={selectedCause.goal}
+          />
+        )}
       </div>
     </section>
   );

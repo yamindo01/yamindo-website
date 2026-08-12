@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Heart, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang, getField } from "@/lib/i18n";
+import DonationModal from "@/components/yamindo/DonationModal";
 
 interface PresetItem {
   id: string;
@@ -19,8 +20,17 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
   const { lang, t } = useLang();
   const [selectedIdx, setSelectedIdx] = useState(1);
   const [customAmount, setCustomAmount] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
 
   const customPresetIdx = presets.findIndex((p) => p.amount === null);
+
+  const displayAmount = useMemo(() => {
+    if (selectedIdx === customPresetIdx && customAmount) {
+      const num = parseInt(customAmount.replace(/\D/g, ""), 10);
+      return isNaN(num) || num <= 0 ? null : num;
+    }
+    return presets[selectedIdx]?.amount ?? null;
+  }, [selectedIdx, customAmount, customPresetIdx, presets]);
 
   return (
     <section id="donasi" className="py-16 md:py-24 bg-gradient-soft">
@@ -89,26 +99,10 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
               </div>
             )}
 
-            {/* Name Input */}
-            <div className="mb-4">
-              <Input
-                placeholder={t("Nama lengkap Anda (opsional)", "Your full name (optional)")}
-                className="rounded-xl"
-              />
-            </div>
-
-            {/* Email Input */}
-            <div className="mb-6">
-              <Input
-                type="email"
-                placeholder={t("Email Anda (opsional)", "Your email (optional)")}
-                className="rounded-xl"
-              />
-            </div>
-
             {/* Donate Button */}
             <Button
               className="w-full bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-xl py-6 text-lg font-semibold shadow-lg shadow-orange-200"
+              onClick={() => setModalOpen(true)}
             >
               <Heart className="w-5 h-5 mr-2 fill-white" />
               {t("Donasi Sekarang", "Donate Now")}
@@ -119,6 +113,14 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
             </p>
           </div>
         </div>
+
+        {/* Donation Modal */}
+        <DonationModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          programTitle={t("Donasi Umum Yamindo", "General Yamindo Donation")}
+          programGoal={undefined}
+        />
       </div>
     </section>
   );
