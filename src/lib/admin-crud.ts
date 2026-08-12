@@ -22,6 +22,7 @@ const ALLOWED_MODELS = [
   "newsArticle",
   "contactMessage",
   "orgMember",
+  "educationService",
 ] as const;
 
 type ModelName = (typeof ALLOWED_MODELS)[number];
@@ -47,6 +48,7 @@ function getModel(model: string) {
     newsArticle: db.newsArticle,
     contactMessage: db.contactMessage,
     orgMember: db.orgMember,
+    educationService: db.educationService,
   };
   return models[model];
 }
