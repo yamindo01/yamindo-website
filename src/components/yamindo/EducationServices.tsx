@@ -2,6 +2,7 @@
 
 import { BookOpen, GraduationCap, Home, School, Building2, Library, Award, Brain, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useLang, getField } from "@/lib/i18n";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -30,7 +31,7 @@ export default function EducationServices({
   if (data.length === 0) return null;
 
   return (
-    <section id="pendidikan" className="py-16 md:py-20 bg-white">
+    <section id="pendidikan" className="py-16 md:py-20 bg-gradient-soft">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-10">
@@ -53,17 +54,17 @@ export default function EducationServices({
           </p>
         </div>
 
-        {/* Cards Grid - 4 cards in one row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+        {/* Cards Grid - 4 columns like Program Utama Kami */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {data.map((item) => {
             const IconComponent = iconMap[item.icon] || BookOpen;
             return (
-              <div
+              <Card
                 key={item.id}
-                className="group relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
+                className="group overflow-hidden rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                {/* Image */}
-                <div className="relative h-56 overflow-hidden">
+                {/* Image Top */}
+                <div className="relative h-48 overflow-hidden">
                   {item.image ? (
                     <img
                       src={item.image}
@@ -72,23 +73,27 @@ export default function EducationServices({
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[var(--yamindo-teal-light)] to-[var(--yamindo-teal)]/20 flex items-center justify-center">
-                      <IconComponent className="w-14 h-14 text-[var(--yamindo-teal)]/40" />
+                      <IconComponent className="w-16 h-16 text-[var(--yamindo-teal)]/40" />
                     </div>
                   )}
                   {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  {/* Icon badge */}
-                  <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center">
-                    <IconComponent className="w-5 h-5 text-[var(--yamindo-teal)]" />
-                  </div>
-                  {/* Title at bottom of image */}
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-white font-bold text-base leading-tight drop-shadow-lg">
-                      {getField(item, "title", lang)}
-                    </h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  {/* Icon badge - center right floating */}
+                  <div className="absolute top-1/2 right-4 -translate-y-1/2 w-12 h-12 rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center">
+                    <IconComponent className="w-6 h-6 text-[var(--yamindo-teal)]" />
                   </div>
                 </div>
-              </div>
+
+                {/* Content Bottom */}
+                <CardContent className="p-5">
+                  <h3 className="text-lg font-bold text-foreground mb-2 leading-tight">
+                    {getField(item, "title", lang)}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+                    {getField(item, "description", lang)}
+                  </p>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
