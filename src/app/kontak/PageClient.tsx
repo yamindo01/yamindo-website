@@ -222,9 +222,11 @@ export default function PageClient({
                       )}
                       <div>
                         <p className="font-bold text-foreground text-base">
+                          {lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
                           {lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName}
                         </p>
-                        <p className="text-xs text-muted-foreground">{t("Rekening", "Account")}</p>
                       </div>
                     </div>
                     <div className="space-y-3">
