@@ -299,7 +299,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "accountNo", label: "Nomor Rekening", type: "text" },
     { key: "accountName", label: "Atas Nama (ID)", type: "text" },
     { key: "en_accountName", label: "Account Name (EN)", type: "text" },
-    { key: "logo", label: "URL Logo Bank", type: "text" },
+    { key: "logo", label: "Logo Bank", type: "image" },
     { key: "order", label: "Urutan", type: "number" },
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
