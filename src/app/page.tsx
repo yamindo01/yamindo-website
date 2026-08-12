@@ -22,6 +22,7 @@ async function getContent() {
   const [
     siteConfigs,
     heroSlides,
+    educationServices,
     services,
     aboutInfo,
     causes,
