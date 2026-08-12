@@ -59,6 +59,7 @@ const ADMIN_TABS = [
   { key: "partners", label: "Mitra" },
   { key: "footer-events", label: "Acara" },
   { key: "donation-presets", label: "Donasi" },
+  { key: "bank-accounts", label: "Rekening" },
   // Sub-page tabs
   { key: "about-sections", label: "Tentang" },
   { key: "education-services", label: "Pendidikan" },
@@ -289,6 +290,16 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "en_position", label: "Position (EN)", type: "text" },
     { key: "photo", label: "Foto", type: "image" },
     { key: "level", label: "Level (1=Ketua, 2=Direktur, 3=Staff)", type: "number" },
+    { key: "order", label: "Urutan", type: "number" },
+    { key: "active", label: "Aktif", type: "checkbox" },
+  ],
+  "bank-accounts": [
+    { key: "bankName", label: "Nama Bank (ID)", type: "text" },
+    { key: "en_bankName", label: "Bank Name (EN)", type: "text" },
+    { key: "accountNo", label: "Nomor Rekening", type: "text" },
+    { key: "accountName", label: "Atas Nama (ID)", type: "text" },
+    { key: "en_accountName", label: "Account Name (EN)", type: "text" },
+    { key: "logo", label: "URL Logo Bank", type: "text" },
     { key: "order", label: "Urutan", type: "number" },
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
@@ -650,6 +661,7 @@ function EntityManager({
     if (tabKey === "team-members") return "name";
     if (tabKey === "counters") return "label";
     if (tabKey === "partners") return "name";
+    if (tabKey === "bank-accounts") return "bankName";
     if (tabKey === "footer-events") return "title";
     if (tabKey === "contact-messages") return "subject";
     return "title";

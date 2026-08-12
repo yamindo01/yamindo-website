@@ -10,6 +10,9 @@ import {
   Map,
   CheckCircle2,
   Loader2,
+  Copy,
+  CheckCheck,
+  Landmark,
 } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -22,8 +25,10 @@ import {
 
 export default function PageClient({
   siteConfig,
+  bankAccounts = [],
 }: {
   siteConfig: Record<string, string>;
+  bankAccounts?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
   const [form, setForm] = useState({
@@ -36,6 +41,7 @@ export default function PageClient({
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [copiedNo, setCopiedNo] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -76,6 +82,12 @@ export default function PageClient({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const copyAccountNo = (no: string) => {
+    navigator.clipboard.writeText(no);
+    setCopiedNo(no);
+    setTimeout(() => setCopiedNo(null), 2000);
   };
 
   const contactCards = [
@@ -169,6 +181,88 @@ export default function PageClient({
           </div>
         </div>
       </section>
+
+      {/* ====== BANK ACCOUNTS ====== */}
+      {bankAccounts.length > 0 && (
+        <section className="py-16 md:py-20 bg-gradient-to-b from-white to-stone-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="text-center mb-10">
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider mb-3">
+                <Landmark className="w-4 h-4" />
+                {t("Rekening Donasi", "Donation Accounts")}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                {t("Rekening Bank Kami", "Our Bank Accounts")}
+              </h2>
+              <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
+                {t(
+                  "Anda dapat menyalurkan donasi melalui rekening bank berikut. Klik nomor rekening untuk menyalin.",
+                  "You can send donations through the following bank accounts. Click the account number to copy."
+                )}
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bankAccounts.map((acc) => (
+                <Card
+                  key={acc.id}
+                  className="border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      {acc.logo ? (
+                        <img
+                          src={acc.logo}
+                          alt={lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName}
+                          className="h-10 w-auto object-contain rounded"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--yamindo-teal)] to-[var(--yamindo-teal-dark)] flex items-center justify-center flex-shrink-0">
+                          <Landmark className="w-6 h-6 text-white" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-bold text-foreground text-base">
+                          {lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{t("Rekening", "Account")}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                          {t("Nomor Rekening", "Account Number")}
+                        </p>
+                        <button
+                          onClick={() => copyAccountNo(acc.accountNo)}
+                          className="flex items-center gap-2 w-full group/btn"
+                          title={t("Salin nomor rekening", "Copy account number")}
+                        >
+                          <span className="font-mono text-lg font-bold text-[var(--yamindo-teal)] tracking-wide">
+                            {acc.accountNo}
+                          </span>
+                          {copiedNo === acc.accountNo ? (
+                            <CheckCheck className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-muted-foreground group-hover/btn:text-[var(--yamindo-teal)] transition-colors flex-shrink-0" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                          {t("Atas Nama", "Account Holder")}
+                        </p>
+                        <p className="text-sm font-medium text-foreground">
+                          {lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ====== CONTACT FORM + MAP ====== */}
       <section className="py-16 md:py-24 bg-gradient-soft">
