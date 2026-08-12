@@ -1,22 +1,9 @@
 "use client";
 
-import { CheckCircle, ArrowRight, Heart } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useLang, getField, getBullets } from "@/lib/i18n";
-
-interface AboutInfo {
-  id: string;
-  title: string;
-  en_title: string;
-  description: string;
-  en_description: string;
-  image: string;
-  badge: string;
-  en_badge: string;
-  bullets: string;
-  en_bullets: string;
-}
+import { useLang, getField } from "@/lib/i18n";
 
 interface CauseItem {
   id: string;
@@ -32,10 +19,8 @@ interface CauseItem {
 }
 
 export default function AboutCauses({
-  aboutInfo,
   causes,
 }: {
-  aboutInfo: AboutInfo | null;
   causes: CauseItem[];
 }) {
   const { lang, t } = useLang();
@@ -58,122 +43,73 @@ export default function AboutCauses({
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-8">
-          {/* About Column */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="relative rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src={aboutInfo?.image || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80"}
-                alt={aboutInfo ? getField(aboutInfo, "title", lang) : t("Tentang Yamindo", "About Yamindo")}
-                className="w-full h-64 object-cover"
-              />
-              {aboutInfo?.badge && (
-                <div className="absolute bottom-4 left-4 bg-[var(--yamindo-teal)] text-white px-4 py-2 rounded-lg text-sm font-bold">
-                  {getField(aboutInfo, "badge", lang)}
+        {/* Causes - Full Width Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {causes.map((cause) => (
+            <div
+              key={cause.id}
+              className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+            >
+              <div className="relative h-48">
+                <img
+                  src={cause.image}
+                  alt={getField(cause, "title", lang)}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 bg-[var(--yamindo-teal-light)] rounded-lg flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-[var(--yamindo-teal)]" />
+                  </div>
+                  <span className="text-xs font-medium text-[var(--yamindo-teal)] bg-[var(--yamindo-teal-light)] px-2 py-0.5 rounded-full">
+                    Yamindo
+                  </span>
                 </div>
-              )}
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-foreground mb-3">
-                {aboutInfo ? getField(aboutInfo, "title", lang) : t("Tentang Yamindo", "About Yamindo")}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                {aboutInfo
-                  ? getField(aboutInfo, "description", lang)
-                  : t("Yayasan Yasir Amin Indonesia (Yamindo) didirikan dengan visi untuk menciptakan Indonesia yang lebih adil dan sejahtera.", "Yasir Amin Indonesia Foundation (Yamindo) was founded with a vision to create a more just and prosperous Indonesia.")}
-              </p>
-              {aboutInfo && (getBullets(aboutInfo, lang)).length > 0 && (
-                <ul className="space-y-3">
-                  {getBullets(aboutInfo, lang).map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-2 text-sm text-foreground/80">
-                      <CheckCircle className="w-5 h-5 text-[var(--yamindo-teal)] flex-shrink-0 mt-0.5" />
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <Button
-                asChild
-                variant="outline"
-                className="mt-5 rounded-full border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)]"
-              >
-                <a href="#tentang">
-                  {t("Pelajari Lebih Lanjut", "Learn More")}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
-            </div>
-          </div>
-
-          {/* Causes Column */}
-          <div className="lg:col-span-3 space-y-6">
-            {causes.map((cause) => (
-              <div
-                key={cause.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-              >
-                <div className="flex flex-col sm:flex-row">
-                  <div className="relative sm:w-48 flex-shrink-0">
-                    <img
-                      src={cause.image}
-                      alt={getField(cause, "title", lang)}
-                      className="w-full h-48 sm:h-full object-cover"
-                    />
+                <h3 className="font-bold text-foreground mb-1">
+                  <a href="#" className="hover:text-[var(--yamindo-teal)] transition-colors">
+                    {getField(cause, "title", lang)}
+                  </a>
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  {getField(cause, "description", lang)}
+                </p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                  <div>
+                    {t("Terkumpul", "Raised")} <span className="font-semibold text-[var(--yamindo-teal)]">{cause.raised}</span>
                   </div>
-                  <div className="flex-1 p-5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-[var(--yamindo-teal-light)] rounded-lg flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-[var(--yamindo-teal)]" />
-                      </div>
-                      <span className="text-xs font-medium text-[var(--yamindo-teal)] bg-[var(--yamindo-teal-light)] px-2 py-0.5 rounded-full">
-                        Yamindo
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-foreground mb-1">
-                      <a href="#" className="hover:text-[var(--yamindo-teal)] transition-colors">
-                        {getField(cause, "title", lang)}
-                      </a>
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {getField(cause, "description", lang)}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                      <div>
-                        {t("Terkumpul", "Raised")} <span className="font-semibold text-[var(--yamindo-teal)]">{cause.raised}</span>
-                      </div>
-                      <div>
-                        {t("Target", "Goal")} <span className="font-semibold text-foreground">{cause.goal}</span>
-                      </div>
-                    </div>
-                    <Progress value={cause.percent} className="h-2 mb-2" />
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[var(--yamindo-teal)]">{cause.percent}%</span>
-                      <Button
-                        size="sm"
-                        className="bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full text-xs px-4"
-                      >
-                        <Heart className="w-3 h-3 mr-1 fill-white" />
-                        {t("Donasi", "Donate")}
-                      </Button>
-                    </div>
+                  <div>
+                    {t("Target", "Goal")} <span className="font-semibold text-foreground">{cause.goal}</span>
                   </div>
+                </div>
+                <Progress value={cause.percent} className="h-2 mb-2" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[var(--yamindo-teal)]">{cause.percent}%</span>
+                  <Button
+                    size="sm"
+                    className="bg-[var(--yamindo-coral)] hover:bg-[var(--yamindo-coral)]/90 text-white rounded-full text-xs px-4"
+                  >
+                    <Heart className="w-3 h-3 mr-1 fill-white" />
+                    {t("Donasi", "Donate")}
+                  </Button>
                 </div>
               </div>
-            ))}
-            {/* Selengkapnya Link */}
-            <div className="pt-2 text-center">
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-full border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] text-sm font-medium px-6"
-              >
-                <a href="/program">
-                  {t("Selengkapnya", "View All Programs")}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
             </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Selengkapnya Link */}
+        <div className="pt-8 text-center">
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] text-sm font-medium px-6"
+          >
+            <a href="/program">
+              {t("Selengkapnya", "View All Programs")}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </a>
+          </Button>
         </div>
       </div>
     </section>

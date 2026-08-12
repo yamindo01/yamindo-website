@@ -79,7 +79,7 @@ export default async function Home() {
           <HeroSlider slides={content.heroSlides} />
           <Services services={content.services} />
           <CtaBanner siteConfig={content.siteConfig} />
-          <AboutCauses aboutInfo={content.aboutInfo} causes={content.causes} />
+          <AboutCauses causes={content.causes} />
           <Counter counters={content.counters} />
           <Team members={content.teamMembers} />
           <Gallery images={content.galleryImages} />
