@@ -61,7 +61,7 @@ const ADMIN_TABS = [
   { key: "donation-presets", label: "Donasi" },
   // Sub-page tabs
   { key: "about-sections", label: "Tentang" },
-  { key: "service-details", label: "Layanan Pg" },
+  { key: "service-details", label: "Layanan Detail" },
   { key: "program-details", label: "Program Pg" },
   { key: "gallery-page-items", label: "Galeri Pg" },
   { key: "news-articles", label: "Berita Pg" },
@@ -208,6 +208,7 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
   "service-details": [
+    { key: "slug", label: "Slug (URL unik, tanpa spasi)", type: "text" },
     { key: "title", label: "Judul (ID)", type: "text" },
     { key: "en_title", label: "Title (EN)", type: "text" },
     { key: "short_desc", label: "Deskripsi Singkat (ID)", type: "textarea" },
