@@ -25,6 +25,9 @@ import {
   Baby,
   Camera,
   Video,
+  Plane,
+  Beef,
+  MonitorSmartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/lib/i18n";
@@ -45,6 +48,12 @@ const serviceIcons: Record<string, React.ComponentType<{ className?: string }>> 
 const tentangIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   "tentang-kami": Building2,
   "tim-kami": Users,
+};
+
+const usahaIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  "travel-haji-umrah": Plane,
+  aqiqah: Beef,
+  "pelatihan-agency": MonitorSmartphone,
 };
 
 const programIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -230,6 +239,7 @@ export default function Header() {
     if (parentKey === "layanan") return serviceIcons[iconKey];
     if (parentKey === "program") return programIcons[iconKey];
     if (parentKey === "galeri") return getGalleryIcon(iconKey);
+    if (parentKey === "usaha") return usahaIcons[iconKey];
     return null;
   };
 
