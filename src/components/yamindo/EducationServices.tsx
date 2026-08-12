@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpen, GraduationCap, Home, School, Building2, Library, Award, Brain, Star } from "lucide-react";
+import { BookOpen, GraduationCap, Home, School, Building2, Library, Award, Brain, Star, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useLang, getField } from "@/lib/i18n";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -29,7 +30,7 @@ export default function EducationServices({
   if (data.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section id="pendidikan" className="py-16 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-10">
@@ -52,17 +53,17 @@ export default function EducationServices({
           </p>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+        {/* Cards Grid - 3 cards centered */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {data.map((item) => {
             const IconComponent = iconMap[item.icon] || BookOpen;
             return (
               <div
-n                key={item.id}
+                key={item.id}
                 className="group relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
               >
                 {/* Image */}
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-56 overflow-hidden">
                   {item.image ? (
                     <img
                       src={item.image}
@@ -82,7 +83,7 @@ n                key={item.id}
                   </div>
                   {/* Title at bottom of image */}
                   <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-white font-bold text-sm leading-tight drop-shadow-lg">
+                    <h3 className="text-white font-bold text-base leading-tight drop-shadow-lg">
                       {getField(item, "title", lang)}
                     </h3>
                   </div>
@@ -90,6 +91,20 @@ n                key={item.id}
               </div>
             );
           })}
+        </div>
+
+        {/* Selengkapnya Link */}
+        <div className="pt-8 text-center">
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full border-[var(--yamindo-teal)] text-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-light)] text-sm font-medium px-6"
+          >
+            <a href="/layanan#pendidikan">
+              {t("Selengkapnya", "View All")}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </a>
+          </Button>
         </div>
       </div>
     </section>
