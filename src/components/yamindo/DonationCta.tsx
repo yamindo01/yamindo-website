@@ -5,6 +5,7 @@ import { Heart, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang, getField } from "@/lib/i18n";
+import { useBankAccounts } from "@/lib/useBankAccounts";
 import DonationModal from "@/components/yamindo/DonationModal";
 
 interface PresetItem {
@@ -21,6 +22,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
   const [selectedIdx, setSelectedIdx] = useState(1);
   const [customAmount, setCustomAmount] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const bankAccounts = useBankAccounts();
 
   const customPresetIdx = presets.findIndex((p) => p.amount === null);
 
@@ -120,6 +122,7 @@ export default function DonationCta({ presets }: { presets: PresetItem[] }) {
           onOpenChange={setModalOpen}
           programTitle={t("Donasi Umum Yamindo", "General Yamindo Donation")}
           programGoal={undefined}
+          bankAccounts={bankAccounts}
         />
       </div>
     </section>

@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLang } from "@/lib/i18n";
+import { useBankAccounts } from "@/lib/useBankAccounts";
 import DonationModal from "@/components/yamindo/DonationModal";
 
 const HERO_IMG = "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ceecac64eb90.jpg";
@@ -120,6 +121,7 @@ const PACKAGES = [
 export default function PageClient() {
   const { lang, t } = useLang();
   const [donateOpen, setDonateOpen] = useState(false);
+  const bankAccounts = useBankAccounts();
 
   return (
     <>
@@ -318,6 +320,7 @@ export default function PageClient() {
         open={donateOpen}
         onOpenChange={setDonateOpen}
         programTitle={t("Travel Haji & Umrah Yamindo", "Yamindo Haji & Umrah Travel")}
+        bankAccounts={bankAccounts}
       />
     </>
   );

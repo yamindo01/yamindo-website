@@ -30,6 +30,7 @@ export interface DonationModalProps {
   programTitle: string;
   programTitleEn?: string;
   programGoal?: string;
+  bankAccounts?: { accountNo: string; accountName: string; en_accountName: string; bankName: string; en_bankName: string; logo?: string }[];
 }
 
 const PAYMENT_METHODS = [
@@ -88,6 +89,7 @@ export default function DonationModal({
   programTitle,
   programTitleEn,
   programGoal,
+  bankAccounts = [],
 }: DonationModalProps) {
   const { lang, t } = useLang();
 
@@ -149,6 +151,22 @@ export default function DonationModal({
         ? selectedMethod.labelEn
         : selectedMethod?.label || paymentMethod;
 
+    let bankInfo = "";
+    if (paymentMethod === "transfer" && bankAccounts.length > 0) {
+      const list = bankAccounts
+        .map(
+          (b) =>
+            `  • ${b.accountName}\n    ${b.bankName} - ${b.accountNo}`
+        )
+        .join("\n");
+      bankInfo =
+        lang === "id"
+          ? `\n*Rekening Donasi:*
+${list}\n`
+          : `\n*Donation Accounts:*
+${list}\n`;
+    }
+
     const message =
       lang === "id"
         ? `Assalamualaikum, saya ingin berdonasi.\n\n` +
@@ -156,15 +174,23 @@ export default function DonationModal({
           `*Nama:* ${name}\n` +
           `*No. HP:* ${phone}\n` +
           `*Jumlah:* ${formatRupiah(finalAmount)}\n` +
-          `*Metode Pembayaran:* ${methodLabel}\n\n` +
-          `Mohon informasi nomor rekening / QRIS / DANA untuk pembayaran. Terima kasih.\n\n_Dikirim melalui website Yamindo_`
+          `*Metode Pembayaran:* ${methodLabel}\n` +
+          bankInfo +
+          (paymentMethod !== "transfer"
+            ? `Mohon informasi ${paymentMethod === "qris" ? "QRIS" : "instruksi DANA"} untuk pembayaran. `
+            : "") +
+          `Terima kasih.\n\n_Dikirim melalui website Yamindo_`
         : `Assalamualaikum, I would like to donate.\n\n` +
           `*Program:* ${title}\n` +
           `*Name:* ${name}\n` +
           `*Phone:* ${phone}\n` +
           `*Amount:* ${formatRupiah(finalAmount)}\n` +
-          `*Payment Method:* ${methodLabel}\n\n` +
-          `Please provide the account number / QRIS / DANA details for payment. Thank you.\n\n_Sent via Yamindo website_`;
+          `*Payment Method:* ${methodLabel}\n` +
+          bankInfo +
+          (paymentMethod !== "transfer"
+            ? `Please provide ${paymentMethod === "qris" ? "QRIS" : "DANA instructions"} for payment. `
+            : "") +
+          `Thank you.\n\n_Sent via Yamindo website_`;
 
     const encoded = encodeURIComponent(message);
     return `https://wa.me/${waNumber}?text=${encoded}`;
@@ -489,6 +515,47 @@ export default function DonationModal({
                 })}
               </RadioGroup>
 
+              {/* Bank accounts shown when Transfer Bank selected */}
+              {paymentMethod === "transfer" && bankAccounts.length > 0 && (
+                <div className="space-y-3 mt-1">
+                  <p className="text-sm font-semibold text-foreground">
+                    {t("Transfer ke rekening berikut:", "Transfer to the following account:")}
+                  </p>
+                  <div className="space-y-2">
+                    {bankAccounts.map((acc, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 rounded-xl border border-blue-100 bg-blue-50/60"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
+                          <Landmark className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName}
+                          </p>
+                          <p className="font-mono text-sm font-bold text-blue-600 mt-0.5">
+                            {acc.accountNo}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(acc.accountNo);
+                          }}
+                          className="text-xs text-blue-500 hover:text-blue-700 font-medium shrink-0 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors"
+                        >
+                          {t("Salin", "Copy")}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Summary mini */}
               <div className="bg-muted/50 rounded-xl p-3 flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
@@ -569,14 +636,38 @@ export default function DonationModal({
                 </div>
               </div>
 
+              {/* Bank details in confirm if transfer */}
+              {paymentMethod === "transfer" && bankAccounts.length > 0 && (
+                <div className="border border-blue-100 rounded-xl overflow-hidden">
+                  <div className="px-4 py-2 bg-blue-50 border-b border-blue-100">
+                    <p className="text-xs font-semibold text-blue-700">
+                      {t("Rekening Transfer", "Transfer Accounts")}
+                    </p>
+                  </div>
+                  <div className="divide-y divide-blue-50">
+                    {bankAccounts.map((acc, idx) => (
+                      <div key={idx} className="px-4 py-2.5">
+                        <p className="text-xs font-semibold text-foreground">{lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}</p>
+                        <p className="text-xs text-muted-foreground">{lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName} — <span className="font-mono font-bold text-blue-600">{acc.accountNo}</span></p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Info note */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
                 <Shield className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-700 leading-relaxed">
-                  {t(
-                    "Setelah mengklik tombol di bawah, Anda akan diarahkan ke WhatsApp untuk mengirim data donasi. Tim Yamindo akan memberikan nomor rekening / QRIS / instruksi DANA selanjutnya.",
-                    "After clicking the button below, you'll be redirected to WhatsApp to send your donation details. The Yamindo team will provide the account number / QRIS / DANA instructions."
-                  )}
+                  {paymentMethod === "transfer"
+                    ? t(
+                        "Setelah mengklik tombol di bawah, data donasi beserta rekening transfer akan dikirim via WhatsApp.",
+                        "After clicking the button below, your donation details along with transfer accounts will be sent via WhatsApp."
+                      )
+                    : t(
+                        "Setelah mengklik tombol di bawah, Anda akan diarahkan ke WhatsApp. Tim Yamindo akan memberikan " + (paymentMethod === "qris" ? "QRIS" : "instruksi DANA") + " selanjutnya.",
+                        "After clicking the button below, you'll be redirected to WhatsApp. The Yamindo team will provide " + (paymentMethod === "qris" ? "QRIS" : "DANA instructions") + " next."
+                      )}
                 </p>
               </div>
             </div>

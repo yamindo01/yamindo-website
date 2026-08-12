@@ -9,6 +9,7 @@ import {
   Search,
 } from "lucide-react";
 import { useLang, getField } from "@/lib/i18n";
+import { useBankAccounts } from "@/lib/useBankAccounts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +69,7 @@ export default function PageClient({
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] =
     useState<ProgramDetailItem | null>(null);
+  const bankAccounts = useBankAccounts();
 
   const openDonationModal = (program: ProgramDetailItem) => {
     setSelectedProgram(program);
@@ -468,6 +470,7 @@ export default function PageClient({
           programTitle={selectedProgram.title}
           programTitleEn={selectedProgram.en_title}
           programGoal={selectedProgram.goal}
+          bankAccounts={bankAccounts}
         />
       )}
     </>

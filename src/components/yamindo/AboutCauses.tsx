@@ -5,6 +5,7 @@ import { Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLang, getField } from "@/lib/i18n";
+import { useBankAccounts } from "@/lib/useBankAccounts";
 import DonationModal from "@/components/yamindo/DonationModal";
 
 interface CauseItem {
@@ -28,6 +29,7 @@ export default function AboutCauses({
   const { lang, t } = useLang();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCause, setSelectedCause] = useState<CauseItem | null>(null);
+  const bankAccounts = useBankAccounts();
 
   const openDonationModal = (cause: CauseItem) => {
     setSelectedCause(cause);
@@ -130,6 +132,7 @@ export default function AboutCauses({
             programTitle={selectedCause.title}
             programTitleEn={selectedCause.en_title}
             programGoal={selectedCause.goal}
+            bankAccounts={bankAccounts}
           />
         )}
       </div>
