@@ -2,6 +2,7 @@ import TopBar from "@/components/yamindo/TopBar";
 import Header from "@/components/yamindo/Header";
 import HeroSlider from "@/components/yamindo/HeroSlider";
 import Services from "@/components/yamindo/Services";
+import EducationServices from "@/components/yamindo/EducationServices";
 import CtaBanner from "@/components/yamindo/CtaBanner";
 import AboutCauses from "@/components/yamindo/AboutCauses";
 import Counter from "@/components/yamindo/Counter";
@@ -35,6 +36,7 @@ async function getContent() {
   ] = await Promise.all([
     db.siteConfig.findMany(),
     db.heroSlide.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
+    db.educationService.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
     db.service.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
     db.aboutInfo.findFirst(),
     db.cause.findMany({ where: { active: true } }),
@@ -54,6 +56,7 @@ async function getContent() {
   return {
     siteConfig,
     heroSlides,
+    educationServices,
     services,
     aboutInfo,
     causes,
@@ -77,6 +80,7 @@ export default async function Home() {
         <Header />
         <main className="flex-1">
           <HeroSlider slides={content.heroSlides} />
+          <EducationServices data={content.educationServices} />
           <Services services={content.services} />
           <CtaBanner siteConfig={content.siteConfig} />
           <AboutCauses causes={content.causes} />
