@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
   GraduationCap,
   Users,
@@ -11,9 +12,7 @@ import {
   HandCoins,
   Landmark,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  X,
+  ArrowRight,
 } from "lucide-react";
 import { useLang, getField } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -73,43 +72,16 @@ export default function PageClient({
   pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Hash navigation: auto-open service from URL hash
+  // Redirect old #hash URLs to /layanan/[slug]
   useEffect(() => {
     const hash = window.location.hash.replace("#", "");
     if (hash && data.some((s) => s.slug === hash)) {
-      setSelectedSlug(hash);
-      // Scroll to the service grid after a short delay for render
-      setTimeout(() => {
-        cardsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 300);
+      router.replace(`/layanan/${hash}`);
     }
-  }, [data]);
-
-  // Listen for hash changes
-  useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (hash && data.some((s) => s.slug === hash)) {
-        setSelectedSlug(hash);
-        setTimeout(() => {
-          cardsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
-      }
-    };
-    window.addEventListener("hashchange", handleHash);
-    return () => window.removeEventListener("hashchange", handleHash);
-  }, [data]);
-
-  const selectedItem = selectedSlug
-    ? data.find((s) => s.slug === selectedSlug) ?? null
-    : null;
-
-  const features = selectedItem
-    ? parseFeatures(selectedItem, lang)
-    : [];
+  }, [data, router]);
 
   // ====== PageContent sections ======
   const heroSection = pageContents.find((pc) => pc.section === "hero");
@@ -225,29 +197,22 @@ export default function PageClient({
             </h2>
             <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
               {t(
-                "Klik layanan mana pun untuk melihat detail dan fitur lengkap program kami.",
-                "Click any service to see details and full program features."
+                "Klik layanan mana pun untuk melihat detail dan informasi lengkap program kami.",
+                "Click any service to see details and full program information."
               )}
             </p>
           </div>
 
           {/* Grid */}
-          <div ref={cardsRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {data.map((service) => {
               const IconComponent = iconMap[service.icon] || Heart;
-              const isSelected = selectedSlug === service.slug;
 
               return (
                 <Card
                   key={service.id}
-                  className={`group overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer hover:shadow-xl ${
-                    isSelected
-                      ? "ring-2 ring-[var(--yamindo-teal)] shadow-lg"
-                      : "border-border/50 hover:border-[var(--yamindo-teal)]/30"
-                  }`}
-                  onClick={() =>
-                    setSelectedSlug(isSelected ? null : service.slug)
-                  }
+                  className="group overflow-hidden rounded-2xl border border-border/50 transition-all duration-300 cursor-pointer hover:shadow-xl hover:border-[var(--yamindo-teal)]/30"
+                  onClick={() => router.push(`/layanan/${service.slug}`)}
                 >
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
@@ -271,14 +236,8 @@ export default function PageClient({
                     {/* Badge */}
                     <div className="absolute bottom-3 right-3">
                       <Badge className="bg-white/90 backdrop-blur-sm text-foreground border-0 text-xs font-medium px-2.5 py-1">
-                        {isSelected
-                          ? t("Tutup", "Close")
-                          : t("Lihat Detail", "View Detail")}
-                        {isSelected ? (
-                          <ChevronUp className="w-3 h-3 ml-1" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3 ml-1" />
-                        )}
+                        {t("Lihat Detail", "View Detail")}
+                        <ArrowRight className="w-3 h-3 ml-1" />
                       </Badge>
                     </div>
                   </div>
@@ -318,104 +277,6 @@ export default function PageClient({
           </div>
         </div>
       </section>
-
-      {/* ====== DETAIL PANEL ====== */}
-      {selectedItem && (
-        <section className="py-16 md:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
-              {/* Image */}
-              <div className="relative">
-                {selectedItem.image ? (
-                  <img
-                    src={selectedItem.image}
-                    alt={getField(selectedItem, "title", lang)}
-                    className="rounded-2xl shadow-xl w-full h-[400px] object-cover"
-                  />
-                ) : (
-                  <div className="rounded-2xl shadow-xl w-full h-[400px] bg-gradient-soft flex items-center justify-center">
-                    {(() => {
-                      const IconComponent = iconMap[selectedItem.icon] || Heart;
-                      return (
-                        <IconComponent className="w-24 h-24 text-[var(--yamindo-teal)]/30" />
-                      );
-                    })()}
-                  </div>
-                )}
-                {/* Decorative elements */}
-                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[var(--yamindo-gold)]/20 rounded-2xl -z-10" />
-                <div className="absolute -top-6 -left-6 w-20 h-20 bg-[var(--yamindo-teal-light)] rounded-2xl -z-10" />
-                {/* Icon overlay */}
-                <div className="absolute top-4 left-4 w-14 h-14 rounded-xl bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center">
-                  {(() => {
-                    const IconComponent = iconMap[selectedItem.icon] || Heart;
-                    return (
-                      <IconComponent className="w-7 h-7 text-[var(--yamindo-teal)]" />
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="lg:sticky lg:top-24">
-                {/* Close button */}
-                <div className="flex items-center justify-between mb-4">
-                  {(() => {
-                    const IconComponent = iconMap[selectedItem.icon] || Heart;
-                    return (
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--yamindo-teal)] uppercase tracking-wider">
-                        <IconComponent className="w-4 h-4" />
-                        {getField(selectedItem, "title", lang)}
-                      </span>
-                    );
-                  })()}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedSlug(null)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    {t("Tutup Detail", "Close Detail")}
-                  </Button>
-                </div>
-
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                  {getField(selectedItem, "title", lang)}
-                </h2>
-
-                <p className="text-muted-foreground leading-relaxed mb-8 text-lg">
-                  {getField(selectedItem, "content", lang)}
-                </p>
-
-                {/* Features list */}
-                {features.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-4">
-                      {t("Fitur Program", "Program Features")}
-                    </h3>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {features.map((feature, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 bg-gradient-soft rounded-xl p-4 border border-border/30"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-[var(--yamindo-teal)] text-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle2 className="w-4 h-4" />
-                          </div>
-                          <span className="text-foreground/80 text-sm font-medium leading-relaxed">
-                            {feature}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ====== CTA SECTION ====== */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)]">
