@@ -227,6 +227,16 @@ export default function PageClient({
                 )}
               </p>
             </div>
+            {/* REKENING RESMI Badge */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="relative flex items-center gap-3">
+                <span className="w-12 h-px bg-[var(--yamindo-teal)]/40" />
+                <span className="inline-block px-5 py-2 rounded-full bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)] text-white text-sm font-bold uppercase tracking-[0.2em] shadow-lg shadow-[var(--yamindo-teal)]/30">
+                  {t("Rekening Resmi", "Official Accounts")}
+                </span>
+                <span className="w-12 h-px bg-[var(--yamindo-teal)]/40" />
+              </div>
+            </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {bankAccounts.map((acc) => (
                 <Card
@@ -247,11 +257,11 @@ export default function PageClient({
                         </div>
                       )}
                       <div>
-                        <p className="font-bold text-foreground text-base">
-                          {lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}
-                        </p>
                         <p className="text-xs text-muted-foreground">
                           {lang === "en" && acc.en_bankName ? acc.en_bankName : acc.bankName}
+                        </p>
+                        <p className="font-bold text-foreground text-base">
+                          {lang === "en" && acc.en_accountName ? acc.en_accountName : acc.accountName}
                         </p>
                       </div>
                     </div>
