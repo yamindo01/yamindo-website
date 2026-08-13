@@ -78,7 +78,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen flex flex-col">
         <TopBar siteConfig={content.siteConfig} />
-        <Header />
+        <Header siteConfig={content.siteConfig} />
         <main className="flex-1">
           <HeroSlider slides={content.heroSlides} />
           <EducationServices data={content.educationServices} />
