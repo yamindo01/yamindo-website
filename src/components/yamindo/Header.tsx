@@ -259,14 +259,11 @@ export default function Header() {
             alt="Yamindo Logo"
             className="h-10 w-auto object-contain rounded-lg"
           />
-          <div>
-            <span className="text-xl font-bold text-[var(--yamindo-teal-dark)]">
-              Yamindo
-            </span>
-            <p className="text-[10px] text-muted-foreground -mt-1 leading-tight">
-              {t("Yayasan Yasir Amin Indonesia", "Yasir Amin Indonesia Foundation")}
-            </p>
-          </div>
+          <img
+            src="/logo-yamindo-text.png"
+            alt="Yamindo"
+            className="h-8 w-auto object-contain"
+          />
         </a>
 
         {/* Desktop Nav */}
