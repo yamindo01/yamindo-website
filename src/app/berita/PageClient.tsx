@@ -59,10 +59,32 @@ function getCategoryStyle(category: string): string {
 
 export default function PageClient({
   data,
+  pageContents = [],
 }: {
   data: NewsArticleItem[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
+
+  // ====== PageContent helper ======
+  function getContentField(section: string, field: string) {
+    const s = pageContents.find(p => p.section === section);
+    if (!s) return "";
+    return lang === "en" ? (s["en_" + field] || s[field]) : (s[field] || s["en_" + field]);
+  }
+
+  // Hero section from DB
+  const heroSection = pageContents.find((pc) => pc.section === "hero");
+  const heroBadge = heroSection
+    ? getContentField("hero", "title")
+    : t("Berita & Artikel", "News & Articles");
+  const heroSubtitle = heroSection
+    ? getContentField("hero", "content")
+    : t(
+        "Update terbaru seputar kegiatan, program, dan perkembangan Yamindo.",
+        "Latest updates on Yamindo activities, programs, and developments."
+      );
+
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -123,17 +145,14 @@ export default function PageClient({
         <div className="relative z-10 text-center px-4 max-w-3xl">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 uppercase tracking-wider mb-4">
             <span className="w-8 h-px bg-white/50" />
-            {t("Berita & Artikel", "News & Articles")}
+            {heroBadge}
             <span className="w-8 h-px bg-white/50" />
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
             {t("Berita Terkini", "Latest News")}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
-              "Update terbaru seputar kegiatan, program, dan perkembangan Yamindo.",
-              "Latest updates on Yamindo activities, programs, and developments."
-            )}
+            {heroSubtitle}
           </p>
         </div>
       </section>

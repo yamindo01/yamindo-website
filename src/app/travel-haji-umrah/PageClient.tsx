@@ -118,10 +118,22 @@ const PACKAGES = [
   },
 ];
 
-export default function PageClient() {
+export default function PageClient({ pageContents = [] }: { pageContents?: Record<string, any>[] }) {
   const { lang, t } = useLang();
   const [donateOpen, setDonateOpen] = useState(false);
   const bankAccounts = useBankAccounts();
+
+  // PageContent sections
+  const heroSection = pageContents.find((pc) => pc.section === 'hero');
+  const advantagesSection = pageContents.find((pc) => pc.section === 'advantages');
+  const packagesSection = pageContents.find((pc) => pc.section === 'packages');
+  const ctaSection = pageContents.find((pc) => pc.section === 'cta');
+
+  // Helper to get localized text from a section
+  const getSectionField = (section: Record<string, any> | undefined, field: 'title' | 'content', fallback: string) => {
+    if (!section) return fallback;
+    return (lang === 'en' && section[`en_${field}`]) ? section[`en_${field}`] : (section[field] || fallback);
+  };
 
   return (
     <>
@@ -142,10 +154,10 @@ export default function PageClient() {
             {t("Travel Haji & Umrah", "Hajj & Umrah Travel")}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
+            {getSectionField(heroSection, 'content', t(
               "Layanan travel haji dan umrah terpercaya dengan pemandu ibadah berpengalaman. Menyediakan paket lengkap mulai dari penerbangan, akomodasi, hingga pembimbingan ibadah di Tanah Suci.",
               "Trusted Hajj and Umrah travel services with experienced worship guides. Providing complete packages from flights, accommodation, to worship guidance in the Holy Land."
-            )}
+            ))}
           </p>
         </div>
       </section>
@@ -155,13 +167,13 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Mengapa Memilih Kami?", "Why Choose Us?")}
+              {getSectionField(advantagesSection, 'title', t("Mengapa Memilih Kami?", "Why Choose Us?"))}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t(
+              {getSectionField(advantagesSection, 'content', t(
                 "Yamindo Travel hadir dengan layanan profesional dan terpercaya untuk perjalanan ibadah Anda",
                 "Yamindo Travel provides professional and trusted services for your worship journey"
-              )}
+              ))}
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -193,13 +205,13 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Paket Travel Kami", "Our Travel Packages")}
+              {getSectionField(packagesSection, 'title', t("Paket Travel Kami", "Our Travel Packages"))}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t(
+              {getSectionField(packagesSection, 'content', t(
                 "Pilih paket perjalanan ibadah yang sesuai dengan kebutuhan dan budget Anda",
                 "Choose the worship travel package that suits your needs and budget"
-              )}
+              ))}
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -290,13 +302,13 @@ export default function PageClient() {
       <section className="py-16 md:py-20 bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t("Wujudkan Rencana Ibadah Anda", "Fulfill Your Worship Plan")}
+            {getSectionField(ctaSection, 'title', t("Wujudkan Rencana Ibadah Anda", "Fulfill Your Worship Plan"))}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {t(
+            {getSectionField(ctaSection, 'content', t(
               "Hubungi kami sekarang untuk konsultasi gratis dan dapatkan penawaran terbaik untuk perjalanan haji dan umrah Anda.",
               "Contact us now for a free consultation and get the best offers for your hajj and umrah journey."
-            )}
+            ))}
           </p>
           <Button
             size="lg"

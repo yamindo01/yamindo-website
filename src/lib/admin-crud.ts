@@ -24,6 +24,7 @@ const ALLOWED_MODELS = [
   "orgMember",
   "educationService",
   "bankAccount",
+  "pageContent",
 ] as const;
 
 type ModelName = (typeof ALLOWED_MODELS)[number];
@@ -51,8 +52,8 @@ function getModel(model: string) {
     orgMember: db.orgMember,
     educationService: db.educationService,
     bankAccount: db.bankAccount,
+    pageContent: db.pageContent,
   };
-  return models[model];
 }
 
 export async function handleGet(model: string, filters?: Record<string, any>) {

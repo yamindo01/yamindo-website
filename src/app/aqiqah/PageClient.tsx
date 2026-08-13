@@ -60,8 +60,21 @@ const PACKAGES = [
   },
 ];
 
-export default function PageClient() {
+export default function PageClient({ pageContents = [] }: { pageContents?: Record<string, any>[] }) {
   const { lang, t } = useLang();
+
+  // PageContent sections
+  const heroSection = pageContents.find((pc) => pc.section === 'hero');
+  const advantagesSection = pageContents.find((pc) => pc.section === 'advantages');
+  const packagesSection = pageContents.find((pc) => pc.section === 'packages');
+  const processSection = pageContents.find((pc) => pc.section === 'process');
+  const ctaSection = pageContents.find((pc) => pc.section === 'cta');
+
+  // Helper to get localized text from a section
+  const getSectionField = (section: Record<string, any> | undefined, field: 'title' | 'content', fallback: string) => {
+    if (!section) return fallback;
+    return (lang === 'en' && section[`en_${field}`]) ? section[`en_${field}`] : (section[field] || fallback);
+  };
 
   return (
     <>
@@ -82,10 +95,10 @@ export default function PageClient() {
             {t("Layanan Aqiqah", "Aqiqah Service")}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
+            {getSectionField(heroSection, 'content', t(
               "Layanan aqiqah lengkap dan syar\u2019i. Kami menyediakan hewan aqiqah berkualitas, penyembelihan sesuai tata cara Islam, hingga distribusi daging ke yang berhak.",
               "Complete and sharia-compliant aqiqah service. We provide quality aqiqah animals, Islamic slaughter procedures, and meat distribution to rightful recipients."
-            )}
+            ))}
           </p>
         </div>
       </section>
@@ -95,7 +108,7 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Keunggulan Layanan Kami", "Our Service Advantages")}
+              {getSectionField(advantagesSection, 'title', t("Keunggulan Layanan Kami", "Our Service Advantages"))}
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -127,7 +140,7 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Paket Aqiqah Kami", "Our Aqiqah Packages")}
+              {getSectionField(packagesSection, 'title', t("Paket Aqiqah Kami", "Our Aqiqah Packages"))}
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -193,7 +206,7 @@ export default function PageClient() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Alur Pemesanan Aqiqah", "Aqiqah Ordering Process")}
+              {getSectionField(processSection, 'title', t("Alur Pemesanan Aqiqah", "Aqiqah Ordering Process"))}
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -238,13 +251,13 @@ export default function PageClient() {
       <section className="py-16 md:py-20 bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t("Segerakan Aqiqah Buah Hati Anda", "Perform Aqiqah for Your Child")}
+            {getSectionField(ctaSection, 'title', t("Segerakan Aqiqah Buah Hati Anda", "Perform Aqiqah for Your Child"))}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {t(
+            {getSectionField(ctaSection, 'content', t(
               "Kami siap membantu Anda melaksanakan aqiqah yang syar\u2019i dan praktis. Hubungi kami sekarang untuk konsultasi dan pemesanan.",
               "We are ready to help you perform a sharia-compliant and practical aqiqah. Contact us now for consultation and ordering."
-            )}
+            ))}
           </p>
           <Button
             size="lg"

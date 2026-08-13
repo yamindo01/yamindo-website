@@ -360,6 +360,23 @@ model EducationService {
   updatedAt   DateTime @updatedAt
 }
 
+model PageContent {
+  id          String   @id @default(cuid())
+  page        String
+  section     String
+  title       String
+  en_title    String   @default("")
+  content     String   @default("")
+  en_content  String   @default("")
+  image       String   @default("")
+  items       String   @default("[]")
+  en_items    String   @default("[]")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model BankAccount {
   id          String   @id @default(cuid())
   bankName    String

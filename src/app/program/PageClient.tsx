@@ -60,10 +60,47 @@ function getStatusLabel(status: string, lang: "id" | "en"): string {
 
 export default function PageClient({
   data,
+  pageContents = [],
 }: {
   data: ProgramDetailItem[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
+
+  // ====== PageContent helper ======
+  function getContentField(section: string, field: string) {
+    const s = pageContents.find(p => p.section === section);
+    if (!s) return "";
+    return lang === "en" ? (s["en_" + field] || s[field]) : (s[field] || s["en_" + field]);
+  }
+
+  // Hero section from DB
+  const heroSection = pageContents.find((pc) => pc.section === "hero");
+  const heroBadge = heroSection
+    ? getContentField("hero", "title")
+    : t("Program Kami", "Our Programs");
+  const heroSubtitle = heroSection
+    ? getContentField("hero", "content")
+    : t(
+        "Dukung program-program donasi kami yang berdampak langsung bagi masyarakat Indonesia.",
+        "Support our donation programs that directly impact Indonesian communities."
+      );
+
+  // Stats section from DB
+  const statsSection = pageContents.find((pc) => pc.section === "stats");
+  let statsData: { num: string; label: string; en_label: string }[] = [];
+  if (statsSection) {
+    try {
+      const raw = lang === "en" && statsSection.en_items ? statsSection.en_items : statsSection.items;
+      const parsed = JSON.parse(raw || "[]");
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        statsData = parsed;
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }
+
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -135,7 +172,7 @@ export default function PageClient({
         <div className="relative z-10 text-center px-4 max-w-3xl">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 uppercase tracking-wider mb-4">
             <span className="w-8 h-px bg-white/50" />
-            {t("Program Kami", "Our Programs")}
+            {heroBadge}
             <span className="w-8 h-px bg-white/50" />
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
@@ -145,10 +182,7 @@ export default function PageClient({
             )}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
-              "Dukung program-program donasi kami yang berdampak langsung bagi masyarakat Indonesia.",
-              "Support our donation programs that directly impact Indonesian communities."
-            )}
+            {heroSubtitle}
           </p>
         </div>
       </section>
@@ -157,18 +191,21 @@ export default function PageClient({
       <section className="bg-white border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { num: `${totalRaised}`, label: t("Program Aktif", "Active Programs") },
-              { num: `${avgPercent}%`, label: t("Rata-rata Terkumpul", "Average Raised") },
-              { num: "4", label: t("Kategori", "Categories") },
-              { num: "100+", label: t("Donatur Baru/Bulan", "New Donors/Month") },
-            ].map((stat) => (
+            {(statsData.length > 0
+              ? statsData
+              : [
+                  { num: `${totalRaised}`, label: "Program Aktif", en_label: "Active Programs" },
+                  { num: `${avgPercent}%`, label: "Rata-rata Terkumpul", en_label: "Average Raised" },
+                  { num: "4", label: "Kategori", en_label: "Categories" },
+                  { num: "100+", label: "Donatur Baru/Bulan", en_label: "New Donors/Month" },
+                ]
+            ).map((stat) => (
               <div key={stat.label}>
                 <div className="text-3xl md:text-4xl font-bold text-[var(--yamindo-teal)]">
                   {stat.num}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1 font-medium">
-                  {stat.label}
+                  {lang === "en" && stat.en_label ? stat.en_label : stat.label}
                 </div>
               </div>
             ))}

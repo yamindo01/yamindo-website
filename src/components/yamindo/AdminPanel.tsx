@@ -68,6 +68,7 @@ const ADMIN_TABS = [
   { key: "gallery-page-items", label: "Galeri Pg" },
   { key: "news-articles", label: "Berita Pg" },
   { key: "contact-messages", label: "Pesan" },
+  { key: "page-contents", label: "Narasi Page" },
 ];
 
 const ICON_OPTIONS = [
@@ -303,6 +304,31 @@ const ENTITY_FIELDS: Record<string, FieldDef[]> = {
     { key: "accountName", label: "Atas Nama (ID)", type: "text" },
     { key: "en_accountName", label: "Account Name (EN)", type: "text" },
     { key: "logo", label: "Logo Bank", type: "image" },
+    { key: "order", label: "Urutan", type: "number" },
+    { key: "active", label: "Aktif", type: "checkbox" },
+  ],
+  "page-contents": [
+    { key: "page", label: "Halaman (slug)", type: "select", options: [
+      { label: "Kontak", value: "kontak" },
+      { label: "Layanan", value: "layanan" },
+      { label: "Travel Haji Umrah", value: "travel-haji-umrah" },
+      { label: "Aqiqah", value: "aqiqah" },
+      { label: "Pelatihan Agency", value: "pelatihan-agency" },
+      { label: "Tentang", value: "tentang" },
+      { label: "Program", value: "program" },
+      { label: "Berita", value: "berita" },
+      { label: "Galeri", value: "galeri" },
+      { label: "Tim", value: "tim" },
+      { label: "Beranda", value: "beranda" },
+    ]},
+    { key: "section", label: "Seksi (hero/stats/intro/desc/cta)", type: "text" },
+    { key: "title", label: "Judul (ID)", type: "text" },
+    { key: "en_title", label: "Title (EN)", type: "text" },
+    { key: "content", label: "Konten Narasi (ID)", type: "textarea" },
+    { key: "en_content", label: "Content Narrative (EN)", type: "textarea" },
+    { key: "image", label: "URL Gambar", type: "image" },
+    { key: "items", label: "Items (ID, JSON array)", type: "text" },
+    { key: "en_items", label: "Items (EN, JSON array)", type: "text" },
     { key: "order", label: "Urutan", type: "number" },
     { key: "active", label: "Aktif", type: "checkbox" },
   ],
@@ -665,6 +691,7 @@ function EntityManager({
     if (tabKey === "counters") return "label";
     if (tabKey === "partners") return "name";
     if (tabKey === "bank-accounts") return "bankName";
+    if (tabKey === "page-contents") return "title";
     if (tabKey === "footer-events") return "title";
     if (tabKey === "contact-messages") return "subject";
     return "title";

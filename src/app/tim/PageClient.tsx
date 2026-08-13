@@ -90,12 +90,33 @@ export default function PageClient({
   teamMembers,
   orgMembers,
   orgPhotos,
+  pageContents = [],
 }: {
   teamMembers: TeamMemberItem[];
   orgMembers: OrgMemberItem[];
   orgPhotos: GalleryPageItem[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
+
+  // ====== PageContent helper ======
+  function getContentField(section: string, field: string) {
+    const s = pageContents.find(p => p.section === section);
+    if (!s) return "";
+    return lang === "en" ? (s["en_" + field] || s[field]) : (s[field] || s["en_" + field]);
+  }
+
+  // Hero section from DB
+  const heroSection = pageContents.find((pc) => pc.section === "hero");
+  const heroBadge = heroSection
+    ? getContentField("hero", "title")
+    : t("Yayasan Yasir Amin Indonesia", "Yasir Amin Indonesia Foundation");
+  const heroSubtitle = heroSection
+    ? getContentField("hero", "content")
+    : t(
+        "Susunan pengurus Yayasan Yasir Amin Indonesia yang bergerak dalam dakwah, pendidikan, dan kemanusiaan.",
+        "Organization structure of Yasir Amin Indonesia Foundation engaged in dakwah, education, and humanitarian work."
+      );
 
   // Group org members by level
   const level1 = orgMembers.filter((m) => m.level === 1);
@@ -114,17 +135,14 @@ export default function PageClient({
         <div className="relative z-10 text-center px-4 max-w-3xl">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 uppercase tracking-wider mb-4">
             <span className="w-8 h-px bg-white/50" />
-            {t("Yayasan Yasir Amin Indonesia", "Yasir Amin Indonesia Foundation")}
+            {heroBadge}
             <span className="w-8 h-px bg-white/50" />
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
             {t("Struktur Organisasi Yamindo", "Yamindo Organization Structure")}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
-              "Susunan pengurus Yayasan Yasir Amin Indonesia yang bergerak dalam dakwah, pendidikan, dan kemanusiaan.",
-              "Organization structure of Yasir Amin Indonesia Foundation engaged in dakwah, education, and humanitarian work."
-            )}
+            {heroSubtitle}
           </p>
         </div>
       </section>

@@ -14,9 +14,14 @@ export default async function KontakPage() {
     orderBy: { order: 'asc' },
   });
 
+  const pageContents = await db.pageContent.findMany({
+    where: { page: 'kontak', active: true },
+    orderBy: { order: 'asc' },
+  });
+
   return (
     <PageLayout>
-      <PageClient siteConfig={JSON.parse(JSON.stringify(siteConfig))} bankAccounts={JSON.parse(JSON.stringify(bankAccounts))} />
+      <PageClient siteConfig={JSON.parse(JSON.stringify(siteConfig))} bankAccounts={JSON.parse(JSON.stringify(bankAccounts))} pageContents={JSON.parse(JSON.stringify(pageContents))} />
     </PageLayout>
   );
 }

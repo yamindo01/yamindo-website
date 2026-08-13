@@ -26,9 +26,11 @@ import {
 export default function PageClient({
   siteConfig,
   bankAccounts = [],
+  pageContents = [],
 }: {
   siteConfig: Record<string, string>;
   bankAccounts?: Record<string, any>[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
   const [form, setForm] = useState({
@@ -90,6 +92,30 @@ export default function PageClient({
     setTimeout(() => setCopiedNo(null), 2000);
   };
 
+  const heroContent = pageContents.find((c) => c.section === 'hero');
+  const formContent = pageContents.find((c) => c.section === 'form');
+
+  const heroTitle = heroContent
+    ? lang === 'en' && heroContent.en_title
+      ? heroContent.en_title
+      : heroContent.title
+    : null;
+  const heroSubtitle = heroContent
+    ? lang === 'en' && heroContent.en_content
+      ? heroContent.en_content
+      : heroContent.content
+    : null;
+  const formTitle = formContent
+    ? lang === 'en' && formContent.en_title
+      ? formContent.en_title
+      : formContent.title
+    : null;
+  const formDescription = formContent
+    ? lang === 'en' && formContent.en_content
+      ? formContent.en_content
+      : formContent.content
+    : null;
+
   const contactCards = [
     {
       icon: Phone,
@@ -138,10 +164,10 @@ export default function PageClient({
             <span className="w-8 h-px bg-white/50" />
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-            {t("Kontak Kami", "Get In Touch")}
+            {heroTitle || t("Kontak Kami", "Get In Touch")}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
+            {heroSubtitle || t(
               "Kami siap mendengar pertanyaan, saran, dan masukan Anda. Jangan ragu untuk menghubungi kami.",
               "We are ready to hear your questions, suggestions, and feedback. Don't hesitate to contact us."
             )}
@@ -277,13 +303,13 @@ export default function PageClient({
                 {t("Kirim Pesan", "Send Message")}
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                {t(
+                {formTitle || t(
                   "Ada pertanyaan? Tulis kepada kami",
                   "Have a question? Write to us"
                 )}
               </h2>
               <p className="text-muted-foreground mb-8">
-                {t(
+                {formDescription || t(
                   "Isi formulir di bawah ini dan tim kami akan merespons sesegera mungkin.",
                   "Fill in the form below and our team will respond as soon as possible."
                 )}

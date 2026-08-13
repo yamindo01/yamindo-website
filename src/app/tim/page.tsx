@@ -5,7 +5,7 @@ import PageLayout from '@/components/yamindo/PageLayout';
 export const dynamic = 'force-dynamic';
 
 export default async function TimPage() {
-  const [teamMembers, orgMembers, orgPhotos] = await Promise.all([
+  const [teamMembers, orgMembers, orgPhotos, pageContents] = await Promise.all([
     db.teamMember.findMany({
       where: { active: true },
       orderBy: { id: 'asc' },
@@ -18,6 +18,10 @@ export default async function TimPage() {
       where: { active: true, category: 'Organisasi' },
       orderBy: { order: 'asc' },
     }),
+    db.pageContent.findMany({
+      where: { page: 'tim', active: true },
+      orderBy: { order: 'asc' },
+    }),
   ]);
 
   return (
@@ -26,6 +30,7 @@ export default async function TimPage() {
         teamMembers={JSON.parse(JSON.stringify(teamMembers))}
         orgMembers={JSON.parse(JSON.stringify(orgMembers))}
         orgPhotos={JSON.parse(JSON.stringify(orgPhotos))}
+        pageContents={JSON.parse(JSON.stringify(pageContents))}
       />
     </PageLayout>
   );

@@ -67,8 +67,10 @@ function parseFeatures(item: ServiceDetailItem, lang: "id" | "en"): string[] {
 
 export default function PageClient({
   data,
+  pageContents = [],
 }: {
   data: ServiceDetailItem[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -80,6 +82,60 @@ export default function PageClient({
   const features = selectedItem
     ? parseFeatures(selectedItem, lang)
     : [];
+
+  // ====== PageContent sections ======
+  const heroSection = pageContents.find((pc) => pc.section === "hero");
+  const statsSection = pageContents.find((pc) => pc.section === "stats");
+  const ctaSection = pageContents.find((pc) => pc.section === "cta");
+
+  // Hero subtitle: DB first, fallback to hardcoded
+  const heroSubtitle = heroSection
+    ? lang === "en" && heroSection.en_content
+      ? heroSection.en_content
+      : heroSection.content
+    : t(
+        "Berbagai program layanan yang kami sediakan untuk memberdayakan masyarakat Indonesia menuju kehidupan yang lebih baik.",
+        "Various service programs we provide to empower Indonesian communities toward a better life."
+      );
+
+  // Stats: parse items/en_items JSON array from DB, fallback to hardcoded
+  let statsData: { num: string; label: string; en_label: string }[] = [];
+  if (statsSection) {
+    try {
+      const raw = lang === "en" && statsSection.en_items ? statsSection.en_items : statsSection.items;
+      const parsed = JSON.parse(raw || "[]");
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        statsData = parsed;
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }
+  const fallbackStats = [
+    { num: "8", label: "Layanan Utama", en_label: "Core Services" },
+    { num: "30+", label: "Provinsi Terjangkau", en_label: "Provinces Reached" },
+    { num: "50K+", label: "Penerima Manfaat", en_label: "Beneficiaries" },
+    { num: "100+", label: "Relawan Aktif", en_label: "Active Volunteers" },
+  ];
+  const displayStats = statsData.length > 0
+    ? statsData
+    : fallbackStats;
+
+  // CTA: DB first, fallback to hardcoded
+  const ctaTitle = ctaSection
+    ? lang === "en" && ctaSection.en_title
+      ? ctaSection.en_title
+      : ctaSection.title
+    : t("Bergabunglah Bersama Kami", "Join Us Today");
+
+  const ctaContent = ctaSection
+    ? lang === "en" && ctaSection.en_content
+      ? ctaSection.en_content
+      : ctaSection.content
+    : t(
+        "Setiap kontribusi Anda membuat perbedaan besar bagi kehidupan masyarakat Indonesia.",
+        "Every contribution you make creates a big difference in Indonesian communities lives."
+      );
 
   return (
     <>
@@ -100,10 +156,7 @@ export default function PageClient({
             )}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
-              "Berbagai program layanan yang kami sediakan untuk memberdayakan masyarakat Indonesia menuju kehidupan yang lebih baik.",
-              "Various service programs we provide to empower Indonesian communities toward a better life."
-            )}
+            {heroSubtitle}
           </p>
         </div>
       </section>
@@ -112,18 +165,13 @@ export default function PageClient({
       <section className="bg-white border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { num: "8", label: t("Layanan Utama", "Core Services") },
-              { num: "30+", label: t("Provinsi Terjangkau", "Provinces Reached") },
-              { num: "50K+", label: t("Penerima Manfaat", "Beneficiaries") },
-              { num: "100+", label: t("Relawan Aktif", "Active Volunteers") },
-            ].map((stat) => (
+            {displayStats.map((stat) => (
               <div key={stat.label}>
                 <div className="text-3xl md:text-4xl font-bold text-[var(--yamindo-teal)]">
                   {stat.num}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1 font-medium">
-                  {stat.label}
+                  {lang === "en" && stat.en_label ? stat.en_label : stat.label}
                 </div>
               </div>
             ))}
@@ -345,16 +393,10 @@ export default function PageClient({
       <section className="py-16 md:py-20 bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t(
-              "Bergabunglah Bersama Kami",
-              "Join Us Today"
-            )}
+            {ctaTitle}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {t(
-              "Setiap kontribusi Anda membuat perbedaan besar bagi kehidupan masyarakat Indonesia.",
-              "Every contribution you make creates a big difference in Indonesian communities lives."
-            )}
+            {ctaContent}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button

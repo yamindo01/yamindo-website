@@ -61,11 +61,32 @@ function parseItems(section: AboutSectionItem, lang: "id" | "en"): string[] {
 export default function PageClient({
   sections,
   testimonials,
+  pageContents = [],
 }: {
   sections: AboutSectionItem[];
   testimonials: TestimonialItem[];
+  pageContents?: Record<string, any>[];
 }) {
   const { lang, t } = useLang();
+
+  // ====== PageContent helper ======
+  function getContentField(section: string, field: string) {
+    const s = pageContents.find(p => p.section === section);
+    if (!s) return "";
+    return lang === "en" ? (s["en_" + field] || s[field]) : (s[field] || s["en_" + field]);
+  }
+
+  // Hero section from DB
+  const heroSection = pageContents.find((pc) => pc.section === "hero");
+  const heroBadge = heroSection
+    ? getContentField("hero", "title")
+    : t("Tentang Kami", "About Us");
+  const heroSubtitle = heroSection
+    ? getContentField("hero", "content")
+    : t(
+        "Mengenal lebih dekat visi, misi, dan perjalanan kami dalam memberdayakan masyarakat Indonesia.",
+        "Get to know our vision, mission, and journey in empowering Indonesian communities."
+      );
 
   const visionSection = sections.find((s) => s.type === "vision");
   const missionSection = sections.find((s) => s.type === "mission");
@@ -86,7 +107,7 @@ export default function PageClient({
         <div className="relative z-10 text-center px-4 max-w-3xl">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 uppercase tracking-wider mb-4">
             <span className="w-8 h-px bg-white/50" />
-            {t("Tentang Kami", "About Us")}
+            {heroBadge}
             <span className="w-8 h-px bg-white/50" />
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
@@ -96,10 +117,7 @@ export default function PageClient({
             )}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
-              "Mengenal lebih dekat visi, misi, dan perjalanan kami dalam memberdayakan masyarakat Indonesia.",
-              "Get to know our vision, mission, and journey in empowering Indonesian communities."
-            )}
+            {heroSubtitle}
           </p>
         </div>
       </section>

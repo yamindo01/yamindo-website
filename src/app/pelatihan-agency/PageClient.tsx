@@ -144,8 +144,42 @@ const TRAININGS = [
   },
 ];
 
-export default function PageClient() {
+export default function PageClient({ pageContents = [] }: { pageContents?: Record<string, any>[] }) {
   const { lang, t } = useLang();
+
+  // PageContent sections
+  const heroSection = pageContents.find((pc) => pc.section === 'hero');
+  const statsSection = pageContents.find((pc) => pc.section === 'stats');
+  const servicesSection = pageContents.find((pc) => pc.section === 'services');
+  const trainingSection = pageContents.find((pc) => pc.section === 'training');
+  const ctaSection = pageContents.find((pc) => pc.section === 'cta');
+
+  // Helper to get localized text from a section
+  const getSectionField = (section: Record<string, any> | undefined, field: 'title' | 'content', fallback: string) => {
+    if (!section) return fallback;
+    return (lang === 'en' && section[`en_${field}`]) ? section[`en_${field}`] : (section[field] || fallback);
+  };
+
+  // Stats: parse items/en_items JSON from DB, fallback to hardcoded
+  let statsData: { num: string; label: string; en_label: string }[] = [];
+  if (statsSection) {
+    try {
+      const raw = (lang === 'en' && statsSection.en_items) ? statsSection.en_items : statsSection.items;
+      const parsed = JSON.parse(raw || '[]');
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        statsData = parsed;
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }
+  const fallbackStats = [
+    { num: '500+', label: 'Klien Terlayani', en_label: 'Clients Served' },
+    { num: '1000+', label: 'Peserta Pelatihan', en_label: 'Training Participants' },
+    { num: '50+', label: 'Brand Dikelola', en_label: 'Brands Managed' },
+    { num: '98%', label: 'Tingkat Kepuasan', en_label: 'Satisfaction Rate' },
+  ];
+  const displayStats = statsData.length > 0 ? statsData : fallbackStats;
 
   return (
     <>
@@ -169,10 +203,10 @@ export default function PageClient() {
             )}
           </h1>
           <p className="text-white/80 mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-            {t(
+            {getSectionField(heroSection, 'content', t(
               "Tingkatkan kehadiran digital bisnis Anda melalui pelatihan praktis dan jasa digital marketing profesional. Dari social media, SEO, hingga iklan digital.",
               "Boost your business digital presence through practical training and professional digital marketing services. From social media, SEO, to digital advertising."
-            )}
+            ))}
           </p>
         </div>
       </section>
@@ -181,18 +215,13 @@ export default function PageClient() {
       <section className="bg-white border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { num: "500+", label: t("Klien Terlayani", "Clients Served") },
-              { num: "1000+", label: t("Peserta Pelatihan", "Training Participants") },
-              { num: "50+", label: t("Brand Dikelola", "Brands Managed") },
-              { num: "98%", label: t("Tingkat Kepuasan", "Satisfaction Rate") },
-            ].map((stat) => (
+            {displayStats.map((stat) => (
               <div key={stat.label}>
                 <div className="text-3xl md:text-4xl font-bold text-[var(--yamindo-teal)]">
                   {stat.num}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1 font-medium">
-                  {stat.label}
+                  {lang === 'en' && stat.en_label ? stat.en_label : stat.label}
                 </div>
               </div>
             ))}
@@ -205,13 +234,13 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Jasa Digital Marketing", "Digital Marketing Services")}
+              {getSectionField(servicesSection, 'title', t("Jasa Digital Marketing", "Digital Marketing Services"))}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t(
+              {getSectionField(servicesSection, 'content', t(
                 "Kami membantu bisnis Anda tumbuh melalui strategi digital marketing yang terukur dan berbasis data",
                 "We help your business grow through measurable and data-driven digital marketing strategies"
-              )}
+              ))}
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,13 +274,13 @@ export default function PageClient() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              {t("Program Pelatihan", "Training Programs")}
+              {getSectionField(trainingSection, 'title', t("Program Pelatihan", "Training Programs"))}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              {t(
+              {getSectionField(trainingSection, 'content', t(
                 "Pelatihan praktis dengan instruktur berpengalaman. Sertifikat diberikan setelah menyelesaikan program.",
                 "Practical training with experienced instructors. Certificate provided upon program completion."
-              )}
+              ))}
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -344,13 +373,13 @@ export default function PageClient() {
       <section className="py-16 md:py-20 bg-gradient-to-r from-[var(--yamindo-teal-dark)] to-[var(--yamindo-teal)]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t("Siap Mendigitalisasi Bisnis Anda?", "Ready to Digitalize Your Business?")}
+            {getSectionField(ctaSection, 'title', t("Siap Mendigitalisasi Bisnis Anda?", "Ready to Digitalize Your Business?"))}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {t(
+            {getSectionField(ctaSection, 'content', t(
               "Konsultasikan kebutuhan digital marketing bisnis Anda secara gratis. Tim kami siap membantu Anda meraih target.",
               "Consult your business digital marketing needs for free. Our team is ready to help you achieve your targets."
-            )}
+            ))}
           </p>
           <Button
             size="lg"
