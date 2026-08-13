@@ -237,10 +237,13 @@ model ServiceDetail {
 
 model ProgramDetail {
   id              String   @id @default(cuid())
+  slug            String   @unique
   title           String
   en_title        String   @default("")
   description     String
   en_description  String   @default("")
+  content         String   @default("")
+  en_content      String   @default("")
   image           String
   category        String
   en_category     String   @default("")
