@@ -254,9 +254,11 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-[var(--yamindo-teal)] to-[var(--yamindo-teal-dark)] rounded-xl flex items-center justify-center">
-            <Heart className="w-5 h-5 text-white fill-white" />
-          </div>
+          <img
+            src="/logo-yamindo.jpg"
+            alt="Yamindo Logo"
+            className="h-10 w-auto object-contain rounded-lg"
+          />
           <div>
             <span className="text-xl font-bold text-[var(--yamindo-teal-dark)]">
               Yamindo
