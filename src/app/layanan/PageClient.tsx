@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   GraduationCap,
   Users,
@@ -74,6 +74,34 @@ export default function PageClient({
 }) {
   const { lang, t } = useLang();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  // Hash navigation: auto-open service from URL hash
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash && data.some((s) => s.slug === hash)) {
+      setSelectedSlug(hash);
+      // Scroll to the service grid after a short delay for render
+      setTimeout(() => {
+        cardsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, [data]);
+
+  // Listen for hash changes
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && data.some((s) => s.slug === hash)) {
+        setSelectedSlug(hash);
+        setTimeout(() => {
+          cardsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    };
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, [data]);
 
   const selectedItem = selectedSlug
     ? data.find((s) => s.slug === selectedSlug) ?? null
@@ -204,7 +232,7 @@ export default function PageClient({
           </div>
 
           {/* Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div ref={cardsRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {data.map((service) => {
               const IconComponent = iconMap[service.icon] || Heart;
               const isSelected = selectedSlug === service.slug;
