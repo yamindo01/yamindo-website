@@ -823,6 +823,7 @@ function SiteConfigManager() {
   const [saving, setSaving] = useState(false);
   const [editKey, setEditKey] = useState("");
   const [editValue, setEditValue] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const CONFIG_LABELS: Record<string, string> = {
     topbar_welcome: "Teks Top Bar (ID)",
@@ -834,6 +835,13 @@ function SiteConfigManager() {
     en_cta_title: "CTA Banner Title (EN)",
     cta_subtitle: "Subtitle CTA Banner (ID)",
     en_cta_subtitle: "CTA Banner Subtitle (EN)",
+  };
+
+  const LOGO_CONFIGS: Record<string, { label: string; type: "image" | "number"; group: string }> = {
+    header_logo: { label: "Logo Ikon Header", type: "image", group: "Logo" },
+    header_logo_text: { label: "Logo Tulisan Header", type: "image", group: "Logo" },
+    header_logo_size: { label: "Ukuran Logo Ikon (px)", type: "number", group: "Logo" },
+    header_logo_text_size: { label: "Ukuran Logo Tulisan (px)", type: "number", group: "Logo" },
   };
 
   const [configRefresh, setConfigRefresh] = useState(0);
@@ -851,22 +859,38 @@ function SiteConfigManager() {
 
   const fetchConfigs = useCallback(() => setConfigRefresh((k) => k + 1), []);
 
-  const handleSave = async () => {
-    if (!editKey) return;
+  const handleSave = async (key: string, value: string) => {
     setSaving(true);
     try {
       await fetch("/api/admin/site-config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: editKey, value: editValue }),
+        body: JSON.stringify({ key, value }),
       });
-      setEditKey("");
-      setEditValue("");
       fetchConfigs();
     } catch (e) {
       console.error(e);
     }
     setSaving(false);
+  };
+
+  const handleImageUpload = (key: string, file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      handleSave(key, base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const isEditing = (key: string) => editKey === key;
+  const startEdit = (key: string, value: string) => {
+    setEditKey(key);
+    setEditValue(value || "");
+  };
+  const cancelEdit = () => {
+    setEditKey("");
+    setEditValue("");
   };
 
   return (
@@ -884,9 +908,122 @@ function SiteConfigManager() {
         </div>
       ) : (
         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+
+          {/* ====== LOGO SECTION ====== */}
+          <div className="p-3 bg-gradient-to-r from-[var(--yamindo-teal-light)]/40 to-transparent border rounded-lg">
+            <h4 className="text-xs font-bold text-[var(--yamindo-teal-dark)] uppercase tracking-wider mb-3">Logo Header</h4>
+            <div className="space-y-3">
+              {Object.entries(LOGO_CONFIGS).map(([key, cfg]) => (
+                <div key={key} className="bg-white border rounded-lg p-3">
+                  {isEditing(key) ? (
+                    <div className="space-y-2">
+                      <Label className="text-xs font-medium text-muted-foreground">{cfg.label}</Label>
+                      {cfg.type === "image" ? (
+                        <div className="space-y-2">
+                          {configs[key] && (
+                            <img src={configs[key]} alt={cfg.label} className="h-12 w-auto object-contain rounded" />
+                          )}
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleImageUpload(key, file);
+                                cancelEdit();
+                              }
+                            }}
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => fileInputRef.current?.click()}
+                              disabled={saving}
+                              className="h-7 text-xs bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]"
+                            >
+                              <Upload className="w-3 h-3 mr-1" />
+                              {configs[key] ? "Ganti Gambar" : "Upload Gambar"}
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 text-xs">
+                              Batal
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={20}
+                            max={120}
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            className="text-sm w-32"
+                            placeholder="40"
+                          />
+                          <span className="text-xs text-muted-foreground">px</span>
+                          <Button
+                            size="sm"
+                            onClick={() => { handleSave(key, editValue); cancelEdit(); }}
+                            disabled={saving}
+                            className="h-7 text-xs bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]"
+                          >
+                            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
+                            Simpan
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 text-xs">
+                            Batal
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground">{cfg.label}</p>
+                          {cfg.type === "image" && configs[key] ? (
+                            <img src={configs[key]} alt={cfg.label} className="h-8 w-auto object-contain rounded mt-1" />
+                          ) : (
+                            <p className="text-sm mt-0.5">
+                              {cfg.type === "number" && configs[key] ? `${configs[key]}px` : configs[key] || "(belum diatur)"}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {cfg.type === "image" && configs[key] && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleSave(key, "")}
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+                            title="Hapus gambar"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEdit(key, configs[key] || "")}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ====== GENERAL SECTION ====== */}
           {Object.entries(CONFIG_LABELS).map(([key, label]) => (
             <div key={key} className="p-3 bg-white border rounded-lg">
-              {editKey === key ? (
+              {isEditing(key) ? (
                 <div className="space-y-2">
                   <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
                   <Input
@@ -897,14 +1034,14 @@ function SiteConfigManager() {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={handleSave}
+                      onClick={() => { handleSave(key, editValue); cancelEdit(); }}
                       disabled={saving}
                       className="h-7 text-xs bg-[var(--yamindo-teal)] hover:bg-[var(--yamindo-teal-dark)]"
                     >
                       {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
                       Simpan
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => { setEditKey(""); setEditValue(""); }} className="h-7 text-xs">
+                    <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 text-xs">
                       Batal
                     </Button>
                   </div>
@@ -918,7 +1055,7 @@ function SiteConfigManager() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => { setEditKey(key); setEditValue(configs[key] || ""); }}
+                    onClick={() => startEdit(key, configs[key] || "")}
                     className="h-8 w-8 p-0"
                   >
                     <Pencil className="w-3.5 h-3.5" />

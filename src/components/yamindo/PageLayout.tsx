@@ -21,7 +21,7 @@ export default async function PageLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar siteConfig={siteConfig} />
-      <Header />
+      <Header siteConfig={siteConfig} />
       <main className="flex-1">{children}</main>
       <Footer siteConfig={siteConfig} events={footerEvents} />
       <AdminPanel />

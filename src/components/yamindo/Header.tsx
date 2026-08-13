@@ -87,7 +87,7 @@ interface DbNavMenu {
   }[];
 }
 
-export default function Header() {
+export default function Header({ siteConfig = {} }: { siteConfig?: Record<string, string> }) {
   const { lang, t } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -254,16 +254,35 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2">
-          <img
-            src="/logo-yamindo.jpg"
-            alt="Yamindo Logo"
-            className="h-10 w-auto object-contain rounded-lg"
-          />
-          <img
-            src="/logo-yamindo-text.png"
-            alt="Yamindo"
-            className="h-10 w-auto object-contain"
-          />
+          {siteConfig.header_logo ? (
+            <img
+              src={siteConfig.header_logo}
+              alt="Yamindo Logo"
+              className="object-contain rounded-lg"
+              style={{ height: `${siteConfig.header_logo_size || 40}px`, width: 'auto' }}
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gradient-to-br from-[var(--yamindo-teal)] to-[var(--yamindo-teal-dark)] rounded-xl flex items-center justify-center">
+              <Heart className="w-5 h-5 text-white fill-white" />
+            </div>
+          )}
+          {siteConfig.header_logo_text ? (
+            <img
+              src={siteConfig.header_logo_text}
+              alt="Yamindo"
+              className="object-contain"
+              style={{ height: `${siteConfig.header_logo_text_size || 40}px`, width: 'auto' }}
+            />
+          ) : (
+            <div>
+              <span className="text-xl font-bold text-[var(--yamindo-teal-dark)]">
+                Yamindo
+              </span>
+              <p className="text-[10px] text-muted-foreground -mt-1 leading-tight">
+                {t("Yayasan Yasir Amin Indonesia", "Yasir Amin Indonesia Foundation")}
+              </p>
+            </div>
+          )}
         </a>
 
         {/* Desktop Nav */}
