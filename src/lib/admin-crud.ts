@@ -54,6 +54,7 @@ function getModel(model: string) {
     bankAccount: db.bankAccount,
     pageContent: db.pageContent,
   };
+  return models;
 }
 
 export async function handleGet(model: string, filters?: Record<string, any>) {
